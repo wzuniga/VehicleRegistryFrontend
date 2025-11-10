@@ -1,8 +1,8 @@
 module.exports = {
   apps: [{
     name: 'vehicle-registry-frontend',
-    script: 'serve',
-    args: 'dist -s -l 5173',
+    script: 'npx',
+    args: 'serve dist -s -l 5173',
     instances: 1,
     autorestart: true,
     watch: false,

@@ -1,0 +1,172 @@
+/* Insurance Summary */
+.insurance-summary {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+  padding: 1rem;
+  background: #f8fafc;
+  border-radius: 8px;
+}
+
+.summary-item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  text-align: center;
+}
+
+.summary-label {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #64748b;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.summary-value {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: #1e293b;
+}
+
+/* Insurance Sections */
+.insurance-section {
+  margin-top: 1.5rem;
+}
+
+.insurance-section:first-of-type {
+  margin-top: 0;
+}
+
+.section-title {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #1e293b;
+  margin: 0 0 1rem 0;
+  padding-bottom: 0.5rem;
+  border-bottom: 2px solid #e2e8f0;
+}
+
+/* Insurance Table */
+.insurance-table-wrapper {
+  overflow-x: auto;
+  border-radius: 8px;
+  border: 1px solid #e2e8f0;
+}
+
+.insurance-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: white;
+}
+
+.insurance-table thead {
+  background-color: #f8fafc;
+  border-bottom: 2px solid #e2e8f0;
+}
+
+.insurance-table th {
+  padding: 0.65rem 0.75rem;
+  text-align: left;
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: #475569;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  white-space: nowrap;
+}
+
+.insurance-table tbody tr {
+  border-bottom: 1px solid #e2e8f0;
+  transition: background-color 0.2s;
+}
+
+.insurance-table tbody tr:hover {
+  background-color: #f8fafc;
+}
+
+.insurance-table tbody tr.row-vigente {
+  background-color: #f0fdf4;
+}
+
+.insurance-table tbody tr.row-vencido {
+  background-color: #fef2f2;
+}
+
+.insurance-table td {
+  padding: 0.65rem 0.75rem;
+  color: #1e293b;
+  font-size: 0.85rem;
+}
+
+.insurance-table td.company-name {
+  font-weight: 600;
+}
+
+.insurance-table td.policy-number {
+  font-family: monospace;
+  font-weight: 600;
+}
+
+.insurance-table td.accidents-count {
+  text-align: center;
+  font-weight: 600;
+}
+
+.insurance-table td.comment {
+  max-width: 200px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 0.8rem;
+  color: #64748b;
+  font-style: italic;
+}
+
+/* Show More Button */
+.show-more-row {
+  background-color: transparent !important;
+  border: none !important;
+}
+
+.show-more-row:hover {
+  background-color: transparent !important;
+}
+
+.show-more-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  width: 100%;
+  padding: 0.75rem 1rem;
+  background: transparent;
+  border: none;
+  color: #3b82f6;
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.show-more-btn:hover {
+  color: #2563eb;
+  background: #eff6ff;
+}
+
+.show-more-btn svg {
+  transition: transform 0.2s;
+}
+
+@media (max-width: 768px) {
+  .insurance-summary {
+    grid-template-columns: 1fr;
+  }
+  
+  .insurance-table th,
+  .insurance-table td {
+    font-size: 0.75rem;
+    padding: 0.5rem;
+  }
+}

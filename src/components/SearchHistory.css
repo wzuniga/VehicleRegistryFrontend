@@ -1,0 +1,13 @@
+.search-history-container {
+  padding: 2rem;
+}
+
+.search-history-container h2 {
+  font-size: 1.5rem;
+  color: #1e293b;
+  margin-bottom: 1rem;
+}
+
+.search-history-container p {
+  color: #64748b;
+}

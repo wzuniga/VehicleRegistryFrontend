@@ -1,0 +1,130 @@
+/* Inspection Grid */
+.inspection-grid-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 1rem;
+}
+
+.inspection-card {
+  background: #f8fafc;
+  border: 2px solid #e2e8f0;
+  border-radius: 8px;
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+.inspection-card:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  transform: translateY(-2px);
+}
+
+.inspection-card.active {
+  border-color: #10b981;
+  background: #f0fdf4;
+}
+
+.inspection-card.inactive {
+  border-color: #ef4444;
+  background: #fef2f2;
+}
+
+.inspection-card-header {
+  padding: 0.75rem 1rem;
+  background: white;
+  border-bottom: 1px solid #e2e8f0;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.inspection-badge {
+  padding: 0.25rem 0.75rem;
+  border-radius: 12px;
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  display: inline-block;
+}
+
+.inspection-badge.vigente {
+  background-color: #10b981;
+  color: white;
+}
+
+.inspection-badge.vencido {
+  background-color: #ef4444;
+  color: white;
+}
+
+.inspection-result-text {
+  font-weight: 600;
+  color: #1e293b;
+  font-size: 0.9rem;
+  flex: 1;
+}
+
+.inspection-card-body {
+  padding: 1rem;
+  display: grid;
+  gap: 0.75rem;
+}
+
+.inspection-info-item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.inspection-info-item.full-width {
+  grid-column: 1 / -1;
+}
+
+.inspection-label {
+  font-weight: 600;
+  color: #64748b;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.inspection-value {
+  color: #1e293b;
+  font-size: 0.875rem;
+  font-weight: 500;
+  line-height: 1.4;
+}
+
+.inspection-card-footer {
+  padding: 0.75rem 1rem;
+  background: white;
+  border-top: 1px solid #e2e8f0;
+}
+
+.details-button {
+  background-color: #1e293b;
+  color: white;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+  white-space: nowrap;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.details-button:hover {
+  background-color: #0f172a;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.details-button:active {
+  transform: translateY(0);
+}

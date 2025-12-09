@@ -174,14 +174,25 @@ const SearchPlate = () => {
     } catch (error) {
       console.error('Error al buscar placa:', error);
       clearInterval(messageInterval);
-      setTimeout(() => {
+      
+      // Si es 409, pasar directamente sin esperar
+      if (error.response?.status === 409) {
         setIsLoading(false);
         setSearchCompleted(true);
         fetchVehicleData(searchPlate);
         fetchInspectionData(searchPlate);
         fetchInsuranceData(searchPlate);
         fetchSunarpData(searchPlate);
-      }, 5000);
+      } else {
+        setTimeout(() => {
+          setIsLoading(false);
+          setSearchCompleted(true);
+          fetchVehicleData(searchPlate);
+          fetchInspectionData(searchPlate);
+          fetchInsuranceData(searchPlate);
+          fetchSunarpData(searchPlate);
+        }, 5000);
+      }
     }
   };
 

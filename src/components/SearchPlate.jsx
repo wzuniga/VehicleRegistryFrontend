@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import api from '../services/api';
-import { VehicleInfoCard, InspectionModal, ImageModal, InsuranceCard, SunarpCard } from './cards';
+import { VehicleInfoCard, InspectionTableCard, InspectionModal, ImageModal, InsuranceCard, SunarpCard } from './cards';
 import './SearchPlate.css';
 
 const SearchPlate = () => {
@@ -19,7 +19,6 @@ const SearchPlate = () => {
   const [isLoadingInsurance, setIsLoadingInsurance] = useState(false);
   const [sunarpData, setSunarpData] = useState(null);
   const [isLoadingSunarp, setIsLoadingSunarp] = useState(false);
-  const [showAllInspections, setShowAllInspections] = useState(false);
 
   const loadingMessages = [
     'Estamos procesando tu solicitud...',
@@ -31,61 +30,117 @@ const SearchPlate = () => {
 
   const fetchVehicleData = async (plate) => {
     setIsLoadingVehicle(true);
-    try {
-      const response = await api.get(`/vehicles/plate/${plate}`);
-      setVehicleData(response.data);
-    } catch (error) {
-      console.error('Error al obtener datos del vehículo:', error);
-      setVehicleData(null);
-    } finally {
-      setIsLoadingVehicle(false);
+    let attempts = 0;
+    const maxAttempts = 10;
+    
+    while (attempts < maxAttempts) {
+      try {
+        const response = await api.get(`/vehicles/plate/${plate}`);
+        if (response.data && Object.keys(response.data).length > 0) {
+          setVehicleData(response.data);
+          setIsLoadingVehicle(false);
+          return;
+        }
+      } catch (error) {
+        console.error(`Error al obtener datos del vehículo (intento ${attempts + 1}):`, error);
+      }
+      
+      attempts++;
+      if (attempts < maxAttempts) {
+        await new Promise(resolve => setTimeout(resolve, 2000));
+      }
     }
+    
+    setVehicleData(null);
+    setIsLoadingVehicle(false);
   };
 
   const fetchInspectionData = async (plate) => {
     setIsLoadingInspection(true);
-    try {
-      const response = await api.get(`/inspeccion-vehicular/plate/${plate}`);
-      if (response.data?.data?.orResult && Array.isArray(response.data.data.orResult)) {
-        const jsonString = response.data.data.orResult[0];
-        const inspections = JSON.parse(jsonString);
-        console.log('Datos de inspección obtenidos:', inspections);
-        setInspectionData(inspections);
+    let attempts = 0;
+    const maxAttempts = 10;
+    
+    while (attempts < maxAttempts) {
+      try {
+        const response = await api.get(`/inspeccion-vehicular/plate/${plate}`);
+        if (response.data?.data?.orResult && Array.isArray(response.data.data.orResult)) {
+          const jsonString = response.data.data.orResult[0];
+          const inspections = JSON.parse(jsonString);
+          if (inspections && inspections.length > 0) {
+            console.log('Datos de inspección obtenidos:', inspections);
+            setInspectionData(inspections);
+            setIsLoadingInspection(false);
+            return;
+          }
+        }
+      } catch (error) {
+        console.error(`Error al obtener datos de inspección (intento ${attempts + 1}):`, error);
       }
-    } catch (error) {
-      console.error('Error al obtener datos de inspección:', error);
-      setInspectionData(null);
-    } finally {
-      setIsLoadingInspection(false);
+      
+      attempts++;
+      if (attempts < maxAttempts) {
+        await new Promise(resolve => setTimeout(resolve, 2000));
+      }
     }
+    
+    setInspectionData(null);
+    setIsLoadingInspection(false);
   };
 
   const fetchInsuranceData = async (plate) => {
     setIsLoadingInsurance(true);
-    try {
-      const response = await api.get(`/sbs-insurance/plate/${plate}`);
-      console.log('Datos de seguros obtenidos:', response.data);
-      setInsuranceData(response.data);
-    } catch (error) {
-      console.error('Error al obtener datos de seguros:', error);
-      setInsuranceData(null);
-    } finally {
-      setIsLoadingInsurance(false);
+    let attempts = 0;
+    const maxAttempts = 10;
+    
+    while (attempts < maxAttempts) {
+      try {
+        const response = await api.get(`/sbs-insurance/plate/${plate}`);
+        if (response.data && Object.keys(response.data).length > 0) {
+          console.log('Datos de seguros obtenidos:', response.data);
+          setInsuranceData(response.data);
+          setIsLoadingInsurance(false);
+          return;
+        }
+      } catch (error) {
+        console.error(`Error al obtener datos de seguros (intento ${attempts + 1}):`, error);
+      }
+      
+      attempts++;
+      if (attempts < maxAttempts) {
+        await new Promise(resolve => setTimeout(resolve, 2000));
+      }
     }
+    
+    setInsuranceData(null);
+    setIsLoadingInsurance(false);
   };
 
   const fetchSunarpData = async (plate) => {
     setIsLoadingSunarp(true);
-    try {
-      const response = await api.get(`/sprl-sunarp/plate/${plate}`);
-      console.log('Datos SUNARP obtenidos:', response.data);
-      setSunarpData(response.data);
-    } catch (error) {
-      console.error('Error al obtener datos SUNARP:', error);
-      setSunarpData(null);
-    } finally {
-      setIsLoadingSunarp(false);
+    let attempts = 0;
+    const maxAttempts = 10;
+    
+    while (attempts < maxAttempts) {
+      try {
+        const response = await api.get(`/sprl-sunarp/plate/${plate}`);
+        if (response.data && Object.keys(response.data).length > 0) {
+          console.log('Datos SUNARP obtenidos:', response.data);
+          setSunarpData(response.data);
+          setIsLoadingSunarp(false);
+          return;
+        }
+      } catch (error) {
+        console.error(`Error al obtener datos SUNARP (intento ${attempts + 1}):`, error);
+      }
+      
+      attempts++;
+      if (attempts < maxAttempts) {
+        await new Promise(resolve => setTimeout(resolve, 2000));
+      }
     }
+    
+    setSunarpData(null);
+    setIsLoadingSunarp(false);
   };
 
   const handleSearch = async () => {
@@ -210,88 +265,11 @@ const SearchPlate = () => {
             isLoading={isLoadingInsurance}
           />
 
-          <div className="info-card">
-            <div className="card-header">
-              <h3>Inspección Técnica Vehicular</h3>
-            </div>
-            <div className="card-content">
-              {isLoadingInspection ? (
-                <div className="card-loader">
-                  <div className="small-loader"></div>
-                  <p>Cargando datos de inspección...</p>
-                </div>
-              ) : inspectionData && inspectionData.length > 0 ? (
-                <div className="inspection-table-wrapper">
-                  <table className="inspection-table">
-                    <thead>
-                      <tr>
-                        <th>Estado</th>
-                        <th>Certificado</th>
-                        <th>Resultado</th>
-                        <th>Vigencia Final</th>
-                        <th>Acciones</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {(showAllInspections ? inspectionData : inspectionData.slice(0, 2)).map((inspection, index) => (
-                        <tr key={index} className={inspection.ESTADO === 'VIGENTE' ? 'row-vigente' : inspection.ESTADO ? '' : 'row-desaprobado'}>
-                          <td>
-                            {inspection.ESTADO && inspection.ESTADO.trim() !== '' && (
-                              <span className={`status-badge ${inspection.ESTADO === 'VIGENTE' ? 'vigente' : 'vencido'}`}>
-                                {inspection.ESTADO}
-                              </span>
-                            )}
-                          </td>
-                          <td className="cert-number">{inspection.NRO_CERTI}</td>
-                          <td className="result-text">{inspection.RESULTADO}</td>
-                          <td>{inspection.REVISIONVIGENCIAFINAL}</td>
-                          <td>
-                            <button 
-                              className="details-btn"
-                              onClick={() => handleShowInspectionDetails(inspection)}
-                            >
-                              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                                <circle cx="12" cy="12" r="10"></circle>
-                                <line x1="12" y1="16" x2="12" y2="12"></line>
-                                <line x1="12" y1="8" x2="12.01" y2="8"></line>
-                              </svg>
-                              Detalles
-                            </button>
-                          </td>
-                        </tr>
-                      ))}
-                      {inspectionData.length > 2 && !showAllInspections && (
-                        <tr className="show-more-row">
-                          <td colSpan="5">
-                            <button className="show-more-btn" onClick={() => setShowAllInspections(true)}>
-                              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                                <polyline points="6 9 12 15 18 9"></polyline>
-                              </svg>
-                              Mostrar {inspectionData.length - 2} inspecciones más
-                            </button>
-                          </td>
-                        </tr>
-                      )}
-                      {showAllInspections && inspectionData.length > 2 && (
-                        <tr className="show-more-row">
-                          <td colSpan="5">
-                            <button className="show-more-btn" onClick={() => setShowAllInspections(false)}>
-                              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                                <polyline points="18 15 12 9 6 15"></polyline>
-                              </svg>
-                              Mostrar menos
-                            </button>
-                          </td>
-                        </tr>
-                      )}
-                    </tbody>
-                  </table>
-                </div>
-              ) : (
-                <p className="no-data">No se encontraron datos de inspección técnica</p>
-              )}
-            </div>
-          </div>
+          <InspectionTableCard
+            inspectionData={inspectionData}
+            isLoading={isLoadingInspection}
+            onShowDetails={handleShowInspectionDetails}
+          />
         </div>
       )}
 

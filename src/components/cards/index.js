@@ -5,3 +5,4 @@ export { default as InspectionModal } from './InspectionModal';
 export { default as ImageModal } from './ImageModal';
 export { default as InsuranceCard } from './InsuranceCard';
 export { default as SunarpCard } from './SunarpCard';
+export { default as SunarpTimeline } from './SunarpTimeline';

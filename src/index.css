@@ -14,6 +14,9 @@
   color: #213547;
   background-color: #ffffff;
 
+  --warning-color: #d19700;
+  --danger-color: #e12305;
+
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
@@ -30,4 +33,3 @@ h1 {
   font-size: 2em;
   line-height: 1.1;
 }
-

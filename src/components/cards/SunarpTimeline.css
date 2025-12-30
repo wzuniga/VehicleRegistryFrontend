@@ -1,0 +1,497 @@
+/* Timeline Container */
+.timeline-card {
+  margin-bottom: 2rem;
+  overflow: visible !important;
+  /* Allow popups to overflow vertically if needed */
+  position: relative;
+  z-index: 5;
+}
+
+.timeline-header {
+  border-radius: 12px 12px 0 0;
+  display: flex !important;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.timeline-controls {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: rgba(255, 255, 255, 0.5);
+  padding: 0.25rem;
+  border-radius: 6px;
+}
+
+.zoom-btn {
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: white;
+  border: 1px solid #e2e8f0;
+  border-radius: 4px;
+  color: #64748b;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.zoom-btn:hover:not(:disabled) {
+  background: #f1f5f9;
+  color: #3b82f6;
+  border-color: #cbd5e1;
+}
+
+.zoom-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.zoom-level {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #475569;
+  min-width: 45px;
+  text-align: center;
+}
+
+.timeline-content {
+  overflow: visible !important;
+  /* Don't clip popups vertically */
+  padding: 0 !important;
+  /* Remove default padding, move to wrapper */
+  position: relative;
+}
+
+.timeline-scroll-wrapper {
+  overflow-x: auto;
+  padding: 4rem 3rem 5rem 3rem;
+  /* Increased top padding for years */
+  /* Add padding here for popup space */
+  width: 100%;
+  scrollbar-width: thin;
+  scrollbar-color: #cbd5e1 transparent;
+}
+
+/* Custom scrollbar for Webkit */
+.timeline-scroll-wrapper::-webkit-scrollbar {
+  height: 6px;
+}
+
+.timeline-scroll-wrapper::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.timeline-scroll-wrapper::-webkit-scrollbar-thumb {
+  background-color: #cbd5e1;
+  border-radius: 3px;
+}
+
+.timeline-container {
+  position: relative;
+  /* width will be set by style prop */
+  transition: width 0.3s ease-out;
+  min-width: 100%;
+}
+
+.timeline-years {
+  position: absolute;
+  top: -25px;
+  left: 0;
+  width: 100%;
+  height: 20px;
+  z-index: 0;
+}
+
+.year-marker {
+  position: absolute;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.year-label {
+  font-size: 0.75rem;
+  color: #94a3b8;
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+
+.year-tick {
+  width: 2px;
+  height: 8px;
+  background-color: #cbd5e1;
+}
+
+.timeline-line {
+  position: absolute;
+  top: 7px;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background: #cbd5e1;
+  z-index: 0;
+}
+
+.timeline-items {
+  position: relative;
+  width: 100%;
+  height: 20px;
+  z-index: 1;
+}
+
+/* Timeline Item */
+.timeline-item {
+  position: absolute;
+  top: 0;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  z-index: 1;
+  pointer-events: none;
+  /* Ignore clicks on wrapper */
+}
+
+.timeline-item:hover {
+  z-index: 1000;
+}
+
+.timeline-dot-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+.timeline-dot {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: #3b82f6;
+  border: 3px solid #fff;
+  box-shadow: 0 0 0 2px #3b82f6;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  pointer-events: auto;
+  /* Enable clicks on dot */
+  cursor: pointer;
+}
+
+.timeline-item:hover .timeline-dot {
+  background: #fff;
+  border-color: #3b82f6;
+  transform: scale(1.3);
+  box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.3);
+}
+
+.timeline-item.warning .timeline-dot {
+  background: var(--warning-color);
+  box-shadow: 0 0 0 2px var(--warning-color);
+}
+
+.timeline-item.warning:hover .timeline-dot {
+  background: #fff;
+  border-color: var(--warning-color);
+  box-shadow: 0 0 0 4px rgba(209, 151, 0, 0.3);
+}
+
+.timeline-item.danger .timeline-dot {
+  background: var(--danger-color);
+  box-shadow: 0 0 0 2px var(--danger-color);
+}
+
+.timeline-item.danger:hover .timeline-dot {
+  background: #fff;
+  border-color: var(--danger-color);
+  box-shadow: 0 0 0 4px rgba(225, 35, 5, 0.3);
+}
+
+.timeline-date {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #64748b;
+  white-space: nowrap;
+  background: rgba(255, 255, 255, 0.9);
+  padding: 2px 4px;
+  border-radius: 4px;
+  backdrop-filter: blur(2px);
+  max-width: 100px;
+  text-align: center;
+}
+
+/* Popup / Tooltip Common */
+.timeline-popup {
+  position: absolute;
+  bottom: 100%;
+  width: 280px;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  border: 1px solid #e2e8f0;
+  padding: 0;
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  pointer-events: none;
+  margin-bottom: 25px;
+  /* Distance from dot center */
+  z-index: 1000;
+}
+
+.timeline-item:hover .timeline-popup {
+  opacity: 1;
+  visibility: visible;
+}
+
+/* --- Alignment Specifics --- */
+
+/* Center Aligned (Default) */
+.timeline-popup.popup-align-center {
+  left: 50%;
+  transform: translateX(-50%) translateY(10px) scale(0.95);
+}
+
+.timeline-item:hover .timeline-popup.popup-align-center {
+  transform: translateX(-50%) translateY(0) scale(1);
+}
+
+.timeline-popup.popup-align-center::after {
+  content: '';
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  border-width: 8px;
+  border-style: solid;
+  border-color: white transparent transparent transparent;
+}
+
+.timeline-popup.popup-align-center::before {
+  content: '';
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  border-width: 9px;
+  border-style: solid;
+  border-color: #e2e8f0 transparent transparent transparent;
+  z-index: -1;
+}
+
+
+/* Left Aligned (for items near the left edge) */
+/* Anchored to the left of the item */
+.timeline-popup.popup-align-left {
+  left: 0;
+  /* Align left edge with item center */
+  transform: translateX(-20px) translateY(10px) scale(0.95);
+  /* Shift slightly left to cover dot */
+  /* Actually, we want the arrow to point to the dot. If pop is left-aligned, arrow should be near left */
+}
+
+.timeline-item:hover .timeline-popup.popup-align-left {
+  transform: translateX(-20px) translateY(0) scale(1);
+}
+
+.timeline-popup.popup-align-left::after {
+  content: '';
+  position: absolute;
+  top: 100%;
+  left: 20px;
+  /* Arrow near left */
+  transform: translateX(0);
+  border-width: 8px;
+  border-style: solid;
+  border-color: white transparent transparent transparent;
+}
+
+.timeline-popup.popup-align-left::before {
+  content: '';
+  position: absolute;
+  top: 100%;
+  left: 20px;
+  transform: translateX(0);
+  border-width: 9px;
+  border-style: solid;
+  border-color: #e2e8f0 transparent transparent transparent;
+  z-index: -1;
+}
+
+
+/* Right Aligned (for items near the right edge) */
+/* Anchored to the right of the item */
+.timeline-popup.popup-align-right {
+  right: 0;
+  left: auto;
+  /* Override left */
+  transform: translateX(20px) translateY(10px) scale(0.95);
+}
+
+.timeline-item:hover .timeline-popup.popup-align-right {
+  transform: translateX(20px) translateY(0) scale(1);
+}
+
+.timeline-popup.popup-align-right::after {
+  content: '';
+  position: absolute;
+  top: 100%;
+  right: 20px;
+  /* Arrow near right */
+  transform: translateX(0);
+  border-width: 8px;
+  border-style: solid;
+  border-color: white transparent transparent transparent;
+}
+
+.timeline-popup.popup-align-right::before {
+  content: '';
+  position: absolute;
+  top: 100%;
+  right: 20px;
+  transform: translateX(0);
+  border-width: 9px;
+  border-style: solid;
+  border-color: #e2e8f0 transparent transparent transparent;
+  z-index: -1;
+}
+
+
+/* Popup Content */
+.popup-header {
+  background: #f8fafc;
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid #e2e8f0;
+  border-radius: 12px 12px 0 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.popup-date {
+  font-size: 0.75rem;
+  color: #64748b;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.popup-category {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: #0f172a;
+  line-height: 1.3;
+}
+
+.popup-body {
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.popup-row {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.popup-label {
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  color: #94a3b8;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+}
+
+.popup-value {
+  font-size: 0.85rem;
+  color: #334155;
+  line-height: 1.4;
+  font-weight: 500;
+}
+
+
+/* Portal Tooltip Styles */
+.timeline-popup-portal {
+  position: fixed;
+  /* Fixed relative to viewport (since we use client rects + scroll? Wait, if we use window.scrollY, absolute to body is better, but portal to body usually implies absolute if body relative, or fixed if we use clientX/Y without scroll) */
+  /* My JS used: top: rect.top + window.scrollY. This implies absolute to document.body (if body is relative) or absolute to page.
+     But if I used position: fixed, I should have used rect.top directly.
+     Let's check JS again: 
+     setTooltipPosition({
+            top: rect.top + window.scrollY, 
+            left: rect.left + (rect.width / 2) + window.scrollX
+     });
+     And render into document.body.
+     If document.body is not positioned, absolute might be relative to html.
+     Safe bet: absolute.
+  */
+  position: absolute;
+  transform: translateX(-50%) translateY(-100%);
+  width: 280px;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  border: 1px solid #e2e8f0;
+  padding: 0;
+  z-index: 10000;
+  /* Very high z-index */
+  pointer-events: none;
+  /* Don't interfere with mouse events */
+  animation: fadeIn 0.2s ease-out;
+}
+
+.timeline-popup-portal .popup-arrow {
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 0;
+  height: 0;
+  border-left: 8px solid transparent;
+  border-right: 8px solid transparent;
+  border-top: 8px solid white;
+}
+
+.timeline-popup-portal .popup-arrow::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  /* Align with bottom of white arrow */
+  left: -9px;
+  /* Adjust for border width difference */
+  width: 0;
+  height: 0;
+  border-left: 9px solid transparent;
+  border-right: 9px solid transparent;
+  border-top: 9px solid #e2e8f0;
+  z-index: -1;
+  transform: translateY(1px);
+  /* Push down slightly to show border */
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(5px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.timeline-selection-overlay {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  background-color: rgba(59, 130, 246, 0.2);
+  /* Blue tint */
+  border: 1px solid #3b82f6;
+  z-index: 10;
+  pointer-events: none;
+  /* Let clicks pass through if needed, though mouseup handles it */
+}

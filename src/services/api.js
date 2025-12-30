@@ -47,4 +47,7 @@ api.interceptors.response.use(
   }
 );
 
+// Methods for specific endpoints if needed, but for now just export the instance
+export const getPendingPlates = () => api.get('/pending-car-plates');
+
 export default api;

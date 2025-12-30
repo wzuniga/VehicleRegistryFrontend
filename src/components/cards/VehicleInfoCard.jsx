@@ -1,11 +1,11 @@
 import PropTypes from 'prop-types';
 import './VehicleInfoCard.css';
 
-const VehicleInfoCard = ({ 
-  vehicleData, 
-  isLoading, 
-  searchPlate, 
-  onImageClick 
+const VehicleInfoCard = ({
+  vehicleData,
+  isLoading,
+  searchPlate,
+  onImageClick
 }) => {
   if (isLoading) {
     return (
@@ -40,18 +40,26 @@ const VehicleInfoCard = ({
     <div className="info-card">
       <div className="card-header">
         <h3>Información del Vehículo</h3>
+        {false && (
+          <div className="warning-icon" title="Información referencial">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
+              <line x1="12" y1="9" x2="12" y2="13"></line>
+              <line x1="12" y1="17" x2="12.01" y2="17"></line>
+            </svg>
+          </div>
+        )}
       </div>
       <div className="card-content">
         <div className="vehicle-info">
           {vehicleData.imageBase64 ? (
             <div className="vehicle-image-container">
-              <img 
-                src={`data:image/jpeg;base64,${vehicleData.imageBase64}`} 
-                alt="Vehículo" 
+              <img
+                src={`data:image/jpeg;base64,${vehicleData.imageBase64}`}
+                alt="Vehículo"
                 className="vehicle-image"
                 onClick={onImageClick}
               />
-              <p className="image-hint">Click para ampliar</p>
             </div>
           ) : (
             <div className="info-grid">

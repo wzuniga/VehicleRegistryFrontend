@@ -1,11 +1,27 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import SearchPlate from '../components/SearchPlate';
 import SearchHistory from '../components/SearchHistory';
 import './MainLayout.css';
 
 const MainLayout = () => {
-  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(() => {
+    // En móvil (max-width: 768px), el sidebar inicia cerrado
+    return window.innerWidth > 768;
+  });
   const [currentPage, setCurrentPage] = useState('Busca tu Placa');
+  const [selectedPlate, setSelectedPlate] = useState(null);
+
+  useEffect(() => {
+    const handleResize = () => {
+      // Ajustar el sidebar cuando cambia el tamaño de la ventana
+      if (window.innerWidth > 768 && !isSidebarOpen) {
+        setIsSidebarOpen(true);
+      }
+    };
+
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, [isSidebarOpen]);
 
   const toggleSidebar = () => {
     setIsSidebarOpen(!isSidebarOpen);
@@ -13,6 +29,13 @@ const MainLayout = () => {
 
   const handleMenuClick = (pageName) => {
     setCurrentPage(pageName);
+    // Clear selected plate when manually navigating IF needed, 
+    // but maybe user wants to keep context. For now, let's keep it simple.
+  };
+
+  const handleSelectPlate = (plate) => {
+    setSelectedPlate(plate);
+    setCurrentPage('Busca tu Placa');
   };
 
   return (
@@ -45,8 +68,8 @@ const MainLayout = () => {
             <nav className="sidebar-nav">
               <ul className="sidebar-menu-top">
                 <li>
-                  <a 
-                    href="#" 
+                  <a
+                    href="#"
                     className={`sidebar-link ${currentPage === 'Busca tu Placa' ? 'active' : ''}`}
                     onClick={(e) => {
                       e.preventDefault();
@@ -63,8 +86,8 @@ const MainLayout = () => {
                   </a>
                 </li>
                 <li>
-                  <a 
-                    href="#" 
+                  <a
+                    href="#"
                     className={`sidebar-link ${currentPage === 'Placas Buscadas' ? 'active' : ''}`}
                     onClick={(e) => {
                       e.preventDefault();
@@ -116,8 +139,12 @@ const MainLayout = () => {
 
         {/* Contenido Principal */}
         <main className="main-content">
-          {currentPage === 'Busca tu Placa' && <SearchPlate />}
-          {currentPage === 'Placas Buscadas' && <SearchHistory />}
+          {currentPage === 'Busca tu Placa' && (
+            <SearchPlate initialPlate={selectedPlate} />
+          )}
+          {currentPage === 'Placas Buscadas' && (
+            <SearchHistory onSelectPlate={handleSelectPlate} />
+          )}
         </main>
       </div>
     </div>

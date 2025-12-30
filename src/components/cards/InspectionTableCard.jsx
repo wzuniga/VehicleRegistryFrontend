@@ -1,9 +1,11 @@
 import { useState } from 'react';
 import PropTypes from 'prop-types';
 import './InspectionTableCard.css';
+import { useWarning } from '../../context/WarningContext';
 
 const InspectionTableCard = ({ inspectionData, isLoading, onShowDetails }) => {
   const [showAllInspections, setShowAllInspections] = useState(false);
+  const { openWarning } = useWarning();
 
   if (isLoading) {
     return (
@@ -34,10 +36,57 @@ const InspectionTableCard = ({ inspectionData, isLoading, onShowDetails }) => {
     );
   }
 
+  const isExpired = (dateString) => {
+    if (!dateString) return false;
+    const parts = dateString.split('/');
+    if (parts.length !== 3) return false;
+    const [day, month, year] = parts;
+    const expiryDate = new Date(`${year}-${month}-${day}`); // YYYY-MM-DD
+    return expiryDate < new Date();
+  };
+
+  // Check latest inspection (assuming first in list is latest or most relevant)
+  const latestInspection = inspectionData[0];
+  const hasExpiredInspection = latestInspection && isExpired(latestInspection.REVISIONVIGENCIAFINAL);
+
+  const shouldShowWarning = hasExpiredInspection;
+  const warningTitle = "Revisión Técnica Vencida";
+
+  const handleWarningClick = () => {
+    if (!shouldShowWarning) return;
+
+    const content = (
+      <div className="warning-details">
+        <div className="warning-detail-item">
+          <strong>Estado de la Revisión:</strong>
+          <p className="status-badge vencido" style={{ display: 'inline-block', marginTop: '0.5rem' }}>
+            VENCIDO ({latestInspection?.REVISIONVIGENCIAFINAL})
+          </p>
+          <p>La vigencia de la última inspección técnica registrada ha finalizado. Se recomienda regularizar la situación.</p>
+        </div>
+      </div>
+    );
+
+    openWarning(warningTitle, content);
+  };
+
   return (
     <div className="info-card">
-      <div className="card-header">
+      <div
+        className="card-header"
+        style={shouldShowWarning ? { backgroundColor: '#d19700', cursor: 'pointer' } : {}}
+        onClick={handleWarningClick}
+      >
         <h3>Inspección Técnica Vehicular</h3>
+        {shouldShowWarning && (
+          <div className="warning-icon" title={warningTitle}>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
+              <line x1="12" y1="9" x2="12" y2="13"></line>
+              <line x1="12" y1="17" x2="12.01" y2="17"></line>
+            </svg>
+          </div>
+        )}
       </div>
       <div className="card-content">
         <div className="inspection-table-wrapper">
@@ -65,7 +114,7 @@ const InspectionTableCard = ({ inspectionData, isLoading, onShowDetails }) => {
                   <td className="result-text">{inspection.RESULTADO}</td>
                   <td>{inspection.REVISIONVIGENCIAFINAL}</td>
                   <td>
-                    <button 
+                    <button
                       className="details-btn"
                       onClick={() => onShowDetails(inspection)}
                     >

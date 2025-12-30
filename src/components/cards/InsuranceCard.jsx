@@ -1,10 +1,14 @@
 import { useState } from 'react';
 import PropTypes from 'prop-types';
 import './InsuranceCard.css';
+import { useWarning } from '../../context/WarningContext';
 
 const InsuranceCard = ({ insuranceData, isLoading }) => {
   const [showAllSoat, setShowAllSoat] = useState(false);
   const [showAllInsurance, setShowAllInsurance] = useState(false);
+  const [showAllCat, setShowAllCat] = useState(false);
+  const { openWarning } = useWarning();
+
   if (isLoading) {
     return (
       <div className="info-card">
@@ -40,7 +44,7 @@ const InsuranceCard = ({ insuranceData, isLoading }) => {
     const parser = new DOMParser();
     const doc = parser.parseFromString(htmlString, 'text/html');
     const rows = doc.querySelectorAll('tbody tr');
-    
+
     return Array.from(rows).map(row => {
       const cells = row.querySelectorAll('td');
       return {
@@ -59,6 +63,7 @@ const InsuranceCard = ({ insuranceData, isLoading }) => {
 
   const soatData = parseSoatTable(insuranceData.soatTableDetails);
   const insuranceDetailsData = parseSoatTable(insuranceData.insuranceTableDetails);
+  const catData = parseSoatTable(insuranceData.catTableDetails);
 
   const isVigente = (endDate) => {
     if (!endDate) return false;
@@ -67,10 +72,78 @@ const InsuranceCard = ({ insuranceData, isLoading }) => {
     return endDateObj >= new Date();
   };
 
+  const hasAccidents = insuranceData && (
+    (insuranceData.soatAccidents > 0) ||
+    (insuranceData.insuranceAccidents > 0) ||
+    (insuranceData.catAccidents > 0)
+  );
+
+  const isLatestSoatExpired = soatData.length > 0 && !isVigente(soatData[0].endDate);
+
+  const shouldShowWarning = hasAccidents || isLatestSoatExpired;
+
+  let warningTitle = "Información referencial";
+  let warningMessages = [];
+
+  if (hasAccidents) warningMessages.push("Este vehículo registra accidentes en su historial.");
+  if (isLatestSoatExpired) warningMessages.push("El SOAT más reciente registrado se encuentra VENCIDO.");
+
+  // Combine logic for title
+  if (hasAccidents && isLatestSoatExpired) {
+    warningTitle = "Registra accidentes y SOAT vencido";
+  } else if (hasAccidents) {
+    warningTitle = "Registra accidentes";
+  } else if (isLatestSoatExpired) {
+    warningTitle = "SOAT vencido";
+  }
+
+  const handleWarningClick = () => {
+    if (!shouldShowWarning) return;
+
+    const content = (
+      <div className="warning-details">
+        {hasAccidents && (
+          <div className="warning-detail-item">
+            <strong>Accidentes Registrados:</strong>
+            <ul style={{ paddingLeft: '1.5rem', marginTop: '0.5rem' }}>
+              {insuranceData.soatAccidents > 0 && <li>Reportados por SOAT: {insuranceData.soatAccidents}</li>}
+              {insuranceData.insuranceAccidents > 0 && <li>Reportados por Otros Seguros: {insuranceData.insuranceAccidents}</li>}
+              {insuranceData.catAccidents > 0 && <li>Reportados por AFOCAT: {insuranceData.catAccidents}</li>}
+            </ul>
+          </div>
+        )}
+        {isLatestSoatExpired && (
+          <div className="warning-detail-item">
+            <strong>Estado del SOAT:</strong>
+            <p className="status-badge vencido" style={{ display: 'inline-block', marginTop: '0.5rem' }}>
+              VENCIDO ({soatData[0].endDate})
+            </p>
+            <p>Se recomienda verificar el estado actual del seguro obligatorio.</p>
+          </div>
+        )}
+      </div>
+    );
+
+    openWarning(warningTitle, content);
+  };
+
   return (
     <div className="info-card">
-      <div className="card-header">
+      <div
+        className="card-header"
+        style={shouldShowWarning ? { backgroundColor: '#d19700', cursor: 'pointer' } : {}}
+        onClick={handleWarningClick}
+      >
         <h3>Información de Seguros (SOAT)</h3>
+        {shouldShowWarning && (
+          <div className="warning-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
+              <line x1="12" y1="9" x2="12" y2="13"></line>
+              <line x1="12" y1="17" x2="12.01" y2="17"></line>
+            </svg>
+          </div>
+        )}
       </div>
       <div className="card-content">
         <div className="insurance-summary">
@@ -198,6 +271,68 @@ const InsuranceCard = ({ insuranceData, isLoading }) => {
                     <tr className="show-more-row">
                       <td colSpan="7">
                         <button className="show-more-btn" onClick={() => setShowAllInsurance(false)}>
+                          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                            <polyline points="18 15 12 9 6 15"></polyline>
+                          </svg>
+                          Mostrar menos
+                        </button>
+                      </td>
+                    </tr>
+                  )}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        )}
+
+        {catData.length > 0 && (
+          <div className="insurance-section">
+            <h4 className="section-title">Certificados CAT (AFOCAT)</h4>
+            <div className="insurance-table-wrapper">
+              <table className="insurance-table">
+                <thead>
+                  <tr>
+                    <th>Estado</th>
+                    <th>AFOCAT</th>
+                    <th>N.° Certificado</th>
+                    <th>Inicio</th>
+                    <th>Fin</th>
+                    <th>Accidentes</th>
+                    <th>Comentario</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {(showAllCat ? catData : catData.slice(0, 2)).map((cat, index) => (
+                    <tr key={index} className={isVigente(cat.endDate) ? 'row-vigente' : 'row-vencido'}>
+                      <td>
+                        <span className={`status-badge ${isVigente(cat.endDate) ? 'vigente' : 'vencido'}`}>
+                          {isVigente(cat.endDate) ? 'VIGENTE' : 'VENCIDO'}
+                        </span>
+                      </td>
+                      <td className="company-name">{cat.company}</td>
+                      <td className="policy-number">{cat.policyNumber || cat.certificateNumber}</td>
+                      <td>{cat.startDate}</td>
+                      <td>{cat.endDate}</td>
+                      <td className="accidents-count">{cat.accidents}</td>
+                      <td className="comment">{cat.comment || '-'}</td>
+                    </tr>
+                  ))}
+                  {catData.length > 2 && !showAllCat && (
+                    <tr className="show-more-row">
+                      <td colSpan="7">
+                        <button className="show-more-btn" onClick={() => setShowAllCat(true)}>
+                          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                            <polyline points="6 9 12 15 18 9"></polyline>
+                          </svg>
+                          Mostrar {catData.length - 2} certificados más
+                        </button>
+                      </td>
+                    </tr>
+                  )}
+                  {showAllCat && catData.length > 2 && (
+                    <tr className="show-more-row">
+                      <td colSpan="7">
+                        <button className="show-more-btn" onClick={() => setShowAllCat(false)}>
                           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                             <polyline points="18 15 12 9 6 15"></polyline>
                           </svg>

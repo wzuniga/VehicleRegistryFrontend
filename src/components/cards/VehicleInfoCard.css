@@ -13,6 +13,7 @@
     opacity: 0;
     transform: translateY(20px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -54,8 +55,13 @@
 }
 
 @keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
+  0% {
+    transform: rotate(0deg);
+  }
+
+  100% {
+    transform: rotate(360deg);
+  }
 }
 
 .card-loader p {
@@ -71,13 +77,21 @@
 
 .vehicle-image-container {
   display: flex;
-  flex-direction: column;
+  justify-content: center;
   align-items: center;
   padding: 1rem;
+  background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+  border-radius: 12px;
+  margin-bottom: 1.5rem;
+  min-height: 200px;
+  max-height: 300px;
+  overflow: hidden;
+  position: relative;
 }
 
 .vehicle-image {
   max-width: 100%;
+  max-height: 300px;
   height: auto;
   border-radius: 8px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
@@ -91,10 +105,12 @@
 }
 
 .image-hint {
-  margin-top: 0.5rem;
+  margin-top: 0.75rem;
   color: #64748b;
   font-size: 0.85rem;
   font-style: italic;
+  text-align: center;
+  width: 100%;
 }
 
 .info-grid {

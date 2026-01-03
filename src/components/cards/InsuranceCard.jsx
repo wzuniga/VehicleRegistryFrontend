@@ -7,13 +7,14 @@ const InsuranceCard = ({ insuranceData, isLoading }) => {
   const [showAllSoat, setShowAllSoat] = useState(false);
   const [showAllInsurance, setShowAllInsurance] = useState(false);
   const [showAllCat, setShowAllCat] = useState(false);
+  const [showDetails, setShowDetails] = useState(false);
   const { openWarning } = useWarning();
 
   if (isLoading) {
     return (
       <div className="info-card">
         <div className="card-header">
-          <h3>Información de Seguros (SOAT)</h3>
+          <h3>Accidentes con Seguros</h3>
         </div>
         <div className="card-content">
           <div className="card-loader">
@@ -29,7 +30,7 @@ const InsuranceCard = ({ insuranceData, isLoading }) => {
     return (
       <div className="info-card">
         <div className="card-header">
-          <h3>Información de Seguros (SOAT)</h3>
+          <h3>Accidentes con Seguros</h3>
         </div>
         <div className="card-content">
           <p className="no-data">No se encontraron datos de seguros</p>
@@ -78,23 +79,14 @@ const InsuranceCard = ({ insuranceData, isLoading }) => {
     (insuranceData.catAccidents > 0)
   );
 
-  const isLatestSoatExpired = soatData.length > 0 && !isVigente(soatData[0].endDate);
-
-  const shouldShowWarning = hasAccidents || isLatestSoatExpired;
+  const shouldShowWarning = hasAccidents;
 
   let warningTitle = "Información referencial";
   let warningMessages = [];
 
-  if (hasAccidents) warningMessages.push("Este vehículo registra accidentes en su historial.");
-  if (isLatestSoatExpired) warningMessages.push("El SOAT más reciente registrado se encuentra VENCIDO.");
-
-  // Combine logic for title
-  if (hasAccidents && isLatestSoatExpired) {
-    warningTitle = "Registra accidentes y SOAT vencido";
-  } else if (hasAccidents) {
+  if (hasAccidents) {
+    warningMessages.push("Este vehículo registra accidentes en su historial.");
     warningTitle = "Registra accidentes";
-  } else if (isLatestSoatExpired) {
-    warningTitle = "SOAT vencido";
   }
 
   const handleWarningClick = () => {
@@ -112,15 +104,6 @@ const InsuranceCard = ({ insuranceData, isLoading }) => {
             </ul>
           </div>
         )}
-        {isLatestSoatExpired && (
-          <div className="warning-detail-item">
-            <strong>Estado del SOAT:</strong>
-            <p className="status-badge vencido" style={{ display: 'inline-block', marginTop: '0.5rem' }}>
-              VENCIDO ({soatData[0].endDate})
-            </p>
-            <p>Se recomienda verificar el estado actual del seguro obligatorio.</p>
-          </div>
-        )}
       </div>
     );
 
@@ -134,7 +117,7 @@ const InsuranceCard = ({ insuranceData, isLoading }) => {
         style={shouldShowWarning ? { backgroundColor: '#d19700', cursor: 'pointer' } : {}}
         onClick={handleWarningClick}
       >
-        <h3>Información de Seguros (SOAT)</h3>
+        <h3>Accidentes con Seguros</h3>
         {shouldShowWarning && (
           <div className="warning-icon">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -148,20 +131,36 @@ const InsuranceCard = ({ insuranceData, isLoading }) => {
       <div className="card-content">
         <div className="insurance-summary">
           <div className="summary-item">
-            <span className="summary-label">Total Accidentes SOAT</span>
+            <span className="summary-label">Accidentes SOAT</span>
             <span className="summary-value">{insuranceData.soatAccidents}</span>
           </div>
           <div className="summary-item">
-            <span className="summary-label">Total Accidentes Seguros</span>
+            <span className="summary-label">Accidentes Seguros Privados</span>
             <span className="summary-value">{insuranceData.insuranceAccidents}</span>
           </div>
           <div className="summary-item">
-            <span className="summary-label">Total Accidentes CAT</span>
+            <span className="summary-label">Accidentes CAT</span>
             <span className="summary-value">{insuranceData.catAccidents}</span>
           </div>
         </div>
 
-        {soatData.length > 0 && (
+        <div style={{ textAlign: 'center', marginTop: '1rem', marginBottom: '1rem' }}>
+          <button 
+            className="show-more-btn" 
+            onClick={() => setShowDetails(!showDetails)}
+            style={{ 
+              padding: '0.75rem 1.5rem',
+              fontWeight: '600'
+            }}
+          >
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <polyline points={showDetails ? "18 15 12 9 6 15" : "6 9 12 15 18 9"}></polyline>
+            </svg>
+            {showDetails ? 'Ocultar detalles' : 'Mostrar más detalles'}
+          </button>
+        </div>
+
+        {showDetails && soatData.length > 0 && (
           <div className="insurance-section">
             <h4 className="section-title">Pólizas SOAT</h4>
             <div className="insurance-table-wrapper">
@@ -178,7 +177,7 @@ const InsuranceCard = ({ insuranceData, isLoading }) => {
                   </tr>
                 </thead>
                 <tbody>
-                  {(showAllSoat ? soatData : soatData.slice(0, 2)).map((soat, index) => (
+                  {(showAllSoat ? soatData : soatData.slice(0, 1)).map((soat, index) => (
                     <tr key={index} className={isVigente(soat.endDate) ? 'row-vigente' : 'row-vencido'}>
                       <td>
                         <span className={`status-badge ${isVigente(soat.endDate) ? 'vigente' : 'vencido'}`}>
@@ -193,19 +192,19 @@ const InsuranceCard = ({ insuranceData, isLoading }) => {
                       <td className="comment">{soat.comment || '-'}</td>
                     </tr>
                   ))}
-                  {soatData.length > 2 && !showAllSoat && (
+                  {soatData.length > 1 && !showAllSoat && (
                     <tr className="show-more-row">
                       <td colSpan="7">
                         <button className="show-more-btn" onClick={() => setShowAllSoat(true)}>
                           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                             <polyline points="6 9 12 15 18 9"></polyline>
                           </svg>
-                          Mostrar {soatData.length - 2} pólizas más
+                          Mostrar {soatData.length - 1} pólizas más
                         </button>
                       </td>
                     </tr>
                   )}
-                  {showAllSoat && soatData.length > 2 && (
+                  {showAllSoat && soatData.length > 1 && (
                     <tr className="show-more-row">
                       <td colSpan="7">
                         <button className="show-more-btn" onClick={() => setShowAllSoat(false)}>
@@ -223,7 +222,7 @@ const InsuranceCard = ({ insuranceData, isLoading }) => {
           </div>
         )}
 
-        {insuranceDetailsData.length > 0 && (
+        {showDetails && insuranceDetailsData.length > 0 && (
           <div className="insurance-section">
             <h4 className="section-title">Otros Seguros</h4>
             <div className="insurance-table-wrapper">
@@ -240,7 +239,7 @@ const InsuranceCard = ({ insuranceData, isLoading }) => {
                   </tr>
                 </thead>
                 <tbody>
-                  {(showAllInsurance ? insuranceDetailsData : insuranceDetailsData.slice(0, 2)).map((insurance, index) => (
+                  {(showAllInsurance ? insuranceDetailsData : insuranceDetailsData.slice(0, 1)).map((insurance, index) => (
                     <tr key={index} className={isVigente(insurance.endDate) ? 'row-vigente' : 'row-vencido'}>
                       <td>
                         <span className={`status-badge ${isVigente(insurance.endDate) ? 'vigente' : 'vencido'}`}>
@@ -255,19 +254,19 @@ const InsuranceCard = ({ insuranceData, isLoading }) => {
                       <td className="comment">{insurance.comment || '-'}</td>
                     </tr>
                   ))}
-                  {insuranceDetailsData.length > 2 && !showAllInsurance && (
+                  {insuranceDetailsData.length > 1 && !showAllInsurance && (
                     <tr className="show-more-row">
                       <td colSpan="7">
                         <button className="show-more-btn" onClick={() => setShowAllInsurance(true)}>
                           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                             <polyline points="6 9 12 15 18 9"></polyline>
                           </svg>
-                          Mostrar {insuranceDetailsData.length - 2} pólizas más
+                          Mostrar {insuranceDetailsData.length - 1} pólizas más
                         </button>
                       </td>
                     </tr>
                   )}
-                  {showAllInsurance && insuranceDetailsData.length > 2 && (
+                  {showAllInsurance && insuranceDetailsData.length > 1 && (
                     <tr className="show-more-row">
                       <td colSpan="7">
                         <button className="show-more-btn" onClick={() => setShowAllInsurance(false)}>
@@ -285,7 +284,7 @@ const InsuranceCard = ({ insuranceData, isLoading }) => {
           </div>
         )}
 
-        {catData.length > 0 && (
+        {showDetails && catData.length > 0 && (
           <div className="insurance-section">
             <h4 className="section-title">Certificados CAT (AFOCAT)</h4>
             <div className="insurance-table-wrapper">
@@ -302,7 +301,7 @@ const InsuranceCard = ({ insuranceData, isLoading }) => {
                   </tr>
                 </thead>
                 <tbody>
-                  {(showAllCat ? catData : catData.slice(0, 2)).map((cat, index) => (
+                  {(showAllCat ? catData : catData.slice(0, 1)).map((cat, index) => (
                     <tr key={index} className={isVigente(cat.endDate) ? 'row-vigente' : 'row-vencido'}>
                       <td>
                         <span className={`status-badge ${isVigente(cat.endDate) ? 'vigente' : 'vencido'}`}>
@@ -317,19 +316,19 @@ const InsuranceCard = ({ insuranceData, isLoading }) => {
                       <td className="comment">{cat.comment || '-'}</td>
                     </tr>
                   ))}
-                  {catData.length > 2 && !showAllCat && (
+                  {catData.length > 1 && !showAllCat && (
                     <tr className="show-more-row">
                       <td colSpan="7">
                         <button className="show-more-btn" onClick={() => setShowAllCat(true)}>
                           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                             <polyline points="6 9 12 15 18 9"></polyline>
                           </svg>
-                          Mostrar {catData.length - 2} certificados más
+                          Mostrar {catData.length - 1} certificados más
                         </button>
                       </td>
                     </tr>
                   )}
-                  {showAllCat && catData.length > 2 && (
+                  {showAllCat && catData.length > 1 && (
                     <tr className="show-more-row">
                       <td colSpan="7">
                         <button className="show-more-btn" onClick={() => setShowAllCat(false)}>

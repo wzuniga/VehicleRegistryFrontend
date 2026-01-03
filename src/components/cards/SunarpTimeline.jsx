@@ -3,7 +3,7 @@ import { createPortal } from 'react-dom';
 import PropTypes from 'prop-types';
 import './SunarpTimeline.css';
 
-const SunarpTimeline = ({ sunarpData, insuranceData }) => {
+const SunarpTimeline = ({ sunarpData, insuranceData, apesegSoatData }) => {
     // 1. Hooks MUST be at the top level, before any returns
     // State for Tooltip Portal
     const [hoveredRecord, setHoveredRecord] = useState(null);
@@ -271,41 +271,87 @@ const SunarpTimeline = ({ sunarpData, insuranceData }) => {
 
         combinedData = [...combinedData, ...accidentTimelineEvents];
 
-        // Check for expired SOAT
-        if (soatRecords.length > 0) {
-            // Sort by end date descending to find the latest policy
-            const sortedSoat = [...soatRecords].sort((a, b) => {
-                const dateA = new Date(parseInsuranceDate(a.endDate));
-                const dateB = new Date(parseInsuranceDate(b.endDate));
-                return dateB - dateA;
+        // Check for CAT (AFOCAT) records - indicator of public service vehicle
+        if (catRecords.length > 0) {
+            // Sort by date descending to get the most recent
+            const sortedCat = [...catRecords].sort((a, b) => {
+                const parseDate = (dateStr) => {
+                    if (!dateStr) return new Date(0);
+                    const parts = dateStr.split('/');
+                    if (parts.length !== 3) return new Date(0);
+                    const [day, month, year] = parts;
+                    return new Date(year, month - 1, day);
+                };
+                return parseDate(b.startDate) - parseDate(a.startDate);
             });
 
-            const latestSoat = sortedSoat[0];
-            if (latestSoat && latestSoat.endDate) {
-                const endDateStr = parseInsuranceDate(latestSoat.endDate);
-                if (endDateStr) {
-                    const endDate = new Date(endDateStr);
-                    const today = new Date();
-                    // Reset time parts for accurate date comparison
-                    today.setHours(0, 0, 0, 0);
-                    endDate.setHours(0, 0, 0, 0);
-
-                    if (endDate < today) {
-                        const expiredSoatEvent = {
-                            id: 'expired-soat-warning',
-                            registrationDate: new Date().toISOString().split('T')[0], // Today
-                            category: 'ALERTA',
-                            actType: 'SOAT VENCIDO',
-                            naturalParticipants: latestSoat.company,
-                            legalParticipants: `Póliza: ${latestSoat.policyNumber}`,
-                            notes: `El SOAT venció el ${latestSoat.endDate}. Se recomienda regularizar su situación.`,
-                            isExpiredSoat: true
-                        };
-                        combinedData.push(expiredSoatEvent);
-                    }
-                }
+            const latestCat = sortedCat[0];
+            if (latestCat && latestCat.startDate) {
+                const catWarningEvent = {
+                    id: 'cat-service-warning',
+                    registrationDate: parseInsuranceDate(latestCat.startDate),
+                    category: 'ALERTA',
+                    actType: 'POSIBLE SERVICIO DE TAXI',
+                    naturalParticipants: latestCat.company,
+                    legalParticipants: `Certificado: ${latestCat.certificateNumber || latestCat.policyNumber || 'N/A'}`,
+                    notes: `Vehículo con seguro AFOCAT (CAT), típicamente usado por unidades de servicio público como taxis. Inicio: ${latestCat.startDate}, Fin: ${latestCat.endDate || 'N/A'}`,
+                    isCatWarning: true
+                };
+                combinedData.push(catWarningEvent);
             }
         }
+    }
+
+    // Check for expired SOAT using APESEG data
+    if (apesegSoatData && apesegSoatData.length > 0) {
+        // Data is already sorted descending in the card, but let's be safe
+        const sortedApeseg = [...apesegSoatData].sort((a, b) => {
+            const parseDate = (dateStr) => {
+                if (!dateStr) return new Date(0);
+                const [day, month, year] = dateStr.split('/');
+                return new Date(year, month - 1, day);
+            };
+            return parseDate(b.fechaInicio) - parseDate(a.fechaInicio);
+        });
+
+        const latestSoat = sortedApeseg[0];
+        if (latestSoat && latestSoat.estado === 'VENCIDO' && latestSoat.fechaFin) {
+            const expiredSoatEvent = {
+                id: 'expired-soat-warning',
+                registrationDate: new Date().toISOString().split('T')[0], // Today
+                category: 'ALERTA',
+                actType: 'SOAT VENCIDO',
+                naturalParticipants: latestSoat.nombreCompania,
+                legalParticipants: `Póliza: ${latestSoat.numeroPoliza}`,
+                notes: `El SOAT venció el ${latestSoat.fechaFin} según registros de APESEG.`,
+                isExpiredSoat: true
+            };
+            combinedData.push(expiredSoatEvent);
+        }
+
+        // Check for Taxi usage in any APESEG record
+        const taxiRecords = apesegSoatData.filter(record => 
+            record.nombreUsoVehiculo && 
+            record.nombreUsoVehiculo.toUpperCase() === 'TAXI'
+        );
+
+        taxiRecords.forEach((taxiRecord, index) => {
+            if (taxiRecord.fechaInicio) {
+                const [day, month, year] = taxiRecord.fechaInicio.split('/');
+                const isoDate = `${year}-${month}-${day}`;
+                const taxiWarningEvent = {
+                    id: `taxi-warning-${index}`,
+                    registrationDate: isoDate,
+                    category: 'ALERTA',
+                    actType: 'USO COMO TAXI',
+                    naturalParticipants: taxiRecord.nombreCompania,
+                    legalParticipants: `Póliza: ${taxiRecord.numeroPoliza || 'N/A'}`,
+                    notes: `Vehículo registrado con uso como TAXI. Inicio: ${taxiRecord.fechaInicio}, Fin: ${taxiRecord.fechaFin || 'N/A'}`,
+                    isTaxiWarning: true
+                };
+                combinedData.push(taxiWarningEvent);
+            }
+        });
     }
 
     // Early return if no data at all
@@ -339,7 +385,9 @@ const SunarpTimeline = ({ sunarpData, insuranceData }) => {
     // Calcular rango de fechas y posiciones
     const dates = sortedData.map(d => new Date(d.registrationDate).getTime());
     const minDate = Math.min(...dates);
-    const maxDate = Math.max(...dates);
+    const today = new Date().getTime();
+    // Asegurar que el maxDate siempre incluya el día actual
+    const maxDate = Math.max(...dates, today);
     const totalDuration = maxDate - minDate;
 
     // Si min y max son iguales (solo 1 registro o registros en el mismo ms), evitar división por cero
@@ -461,7 +509,7 @@ const SunarpTimeline = ({ sunarpData, insuranceData }) => {
                                 const actTypeUpper = record.actType?.toUpperCase() || '';
                                 const categoryUpper = record.category?.toUpperCase() || '';
 
-                                const isWarning = actTypeUpper.includes('CAMBIO DE MOTOR') || record.isExpiredSoat;
+                                const isWarning = actTypeUpper.includes('CAMBIO DE MOTOR') || record.isExpiredSoat || record.isTaxiWarning || record.isCatWarning;
                                 const isDanger = actTypeUpper.includes('ANOTACIÓN DE EMBARGO') ||
                                     actTypeUpper.includes('ANOTACION DE EMBARGO') ||
                                     categoryUpper.includes('REEMPLACAMIENTO') ||
@@ -473,6 +521,8 @@ const SunarpTimeline = ({ sunarpData, insuranceData }) => {
 
                                 if (record.isAccident) itemClass += ' accident-node';
                                 if (record.isExpiredSoat) itemClass += ' expired-soat-node';
+                                if (record.isTaxiWarning) itemClass += ' taxi-warning-node';
+                                if (record.isCatWarning) itemClass += ' cat-warning-node';
 
                                 return (
                                     <div
@@ -499,6 +549,20 @@ const SunarpTimeline = ({ sunarpData, insuranceData }) => {
                                                         <line x1="12" y1="17" x2="12.01" y2="17"></line>
                                                     </svg>
                                                 )}
+                                                {record.isTaxiWarning && (
+                                                    <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)' }}>
+                                                        <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
+                                                        <line x1="12" y1="9" x2="12" y2="13"></line>
+                                                        <line x1="12" y1="17" x2="12.01" y2="17"></line>
+                                                    </svg>
+                                                )}
+                                                {record.isCatWarning && (
+                                                    <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)' }}>
+                                                        <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
+                                                        <line x1="12" y1="9" x2="12" y2="13"></line>
+                                                        <line x1="12" y1="17" x2="12.01" y2="17"></line>
+                                                    </svg>
+                                                )}
                                             </div>
                                             <div className="timeline-date">{formatDate(record.registrationDate)}</div>
                                         </div>
@@ -506,6 +570,20 @@ const SunarpTimeline = ({ sunarpData, insuranceData }) => {
                                     </div>
                                 );
                             })}
+                            {/* Marcador para el día actual */}
+                            <div
+                                className="timeline-item today-marker"
+                                style={{ left: getPositionStyle(new Date().toISOString()).left }}
+                            >
+                                <div className="timeline-dot-wrapper">
+                                    <div className="timeline-dot today-dot">
+                                        <svg width="8" height="8" viewBox="0 0 24 24" fill="white" stroke="white" strokeWidth="2">
+                                            
+                                        </svg>
+                                    </div>
+                                    <div className="timeline-date today-label">HOY</div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -526,6 +604,8 @@ const SunarpTimeline = ({ sunarpData, insuranceData }) => {
                             {hoveredRecord.category}
                             {hoveredRecord.isAccident && <span style={{ marginLeft: '8px', fontSize: '0.7em', background: '#e12305', color: 'white', padding: '2px 6px', borderRadius: '4px' }}>PELIGRO</span>}
                             {hoveredRecord.isExpiredSoat && <span style={{ marginLeft: '8px', fontSize: '0.7em', background: '#d19700', color: 'white', padding: '2px 6px', borderRadius: '4px' }}>VENCIDO</span>}
+                            {hoveredRecord.isTaxiWarning && <span style={{ marginLeft: '8px', fontSize: '0.7em', background: '#d19700', color: 'white', padding: '2px 6px', borderRadius: '4px' }}>TAXI</span>}
+                            {hoveredRecord.isCatWarning && <span style={{ marginLeft: '8px', fontSize: '0.7em', background: '#d19700', color: 'white', padding: '2px 6px', borderRadius: '4px' }}>CAT</span>}
                         </span>
                     </div>
                     <div className="popup-body">
@@ -565,7 +645,8 @@ SunarpTimeline.propTypes = {
             notes: PropTypes.string
         })
     ),
-    insuranceData: PropTypes.object
+    insuranceData: PropTypes.object,
+    apesegSoatData: PropTypes.array
 };
 
 export default SunarpTimeline;

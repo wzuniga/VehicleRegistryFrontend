@@ -158,6 +158,13 @@
   transition: transform 0.2s;
 }
 
+.show-more-container {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  padding: 0.5rem 0;
+}
+
 @media (max-width: 768px) {
   .inspection-table th,
   .inspection-table td {

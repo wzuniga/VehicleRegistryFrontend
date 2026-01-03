@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import api from '../services/api';
-import { VehicleInfoCard, InspectionTableCard, InspectionModal, ImageModal, InsuranceCard, SunarpCard, SunarpTimeline } from './cards';
+import { VehicleInfoCard, InspectionTableCard, InspectionModal, ImageModal, InsuranceCard, SunarpCard, SunarpTimeline, ApesegSoatCard } from './cards';
 import './SearchPlate.css';
 
 import PropTypes from 'prop-types';
@@ -46,6 +46,8 @@ const SearchPlate = ({ initialPlate }) => {
   const [isLoadingInsurance, setIsLoadingInsurance] = useState(false);
   const [sunarpData, setSunarpData] = useState(null);
   const [isLoadingSunarp, setIsLoadingSunarp] = useState(false);
+  const [apesegSoatData, setApesegSoatData] = useState(null);
+  const [isLoadingApesegSoat, setIsLoadingApesegSoat] = useState(false);
 
   const loadingMessages = [
     'Estamos procesando tu solicitud...',
@@ -58,7 +60,7 @@ const SearchPlate = ({ initialPlate }) => {
   const fetchVehicleData = async (plate) => {
     setIsLoadingVehicle(true);
     let attempts = 0;
-    const maxAttempts = 10;
+    const maxAttempts = 50;
 
     while (attempts < maxAttempts) {
       try {
@@ -85,7 +87,7 @@ const SearchPlate = ({ initialPlate }) => {
   const fetchInspectionData = async (plate) => {
     setIsLoadingInspection(true);
     let attempts = 0;
-    const maxAttempts = 10;
+    const maxAttempts = 50;
 
     while (attempts < maxAttempts) {
       try {
@@ -117,7 +119,7 @@ const SearchPlate = ({ initialPlate }) => {
   const fetchInsuranceData = async (plate) => {
     setIsLoadingInsurance(true);
     let attempts = 0;
-    const maxAttempts = 10;
+    const maxAttempts = 50;
 
     while (attempts < maxAttempts) {
       try {
@@ -145,7 +147,7 @@ const SearchPlate = ({ initialPlate }) => {
   const fetchSunarpData = async (plate) => {
     setIsLoadingSunarp(true);
     let attempts = 0;
-    const maxAttempts = 10;
+    const maxAttempts = 50;
 
     while (attempts < maxAttempts) {
       try {
@@ -168,6 +170,34 @@ const SearchPlate = ({ initialPlate }) => {
 
     setSunarpData(null);
     setIsLoadingSunarp(false);
+  };
+
+  const fetchApesegSoatData = async (plate) => {
+    setIsLoadingApesegSoat(true);
+    let attempts = 0;
+    const maxAttempts = 50;
+
+    while (attempts < maxAttempts) {
+      try {
+        const response = await api.get(`/soat-apeseg/plate/${plate}`);
+        if (response.data && Array.isArray(response.data)) {
+          console.log('Datos APESEG obtenidos:', response.data);
+          setApesegSoatData(response.data);
+          setIsLoadingApesegSoat(false);
+          return;
+        }
+      } catch (error) {
+        console.error(`Error al obtener datos APESEG (intento ${attempts + 1}):`, error);
+      }
+
+      attempts++;
+      if (attempts < maxAttempts) {
+        await new Promise(resolve => setTimeout(resolve, 2000));
+      }
+    }
+
+    setApesegSoatData(null);
+    setIsLoadingApesegSoat(false);
   };
 
   const handleSearch = async (plateOverride, forceWait = false) => {
@@ -204,6 +234,7 @@ const SearchPlate = ({ initialPlate }) => {
         fetchInspectionData(plateToSearch);
         fetchInsuranceData(plateToSearch);
         fetchSunarpData(plateToSearch);
+        fetchApesegSoatData(plateToSearch);
       }, 5000);
     } catch (error) {
       console.error('Error al buscar placa:', error);
@@ -217,6 +248,7 @@ const SearchPlate = ({ initialPlate }) => {
         fetchInspectionData(plateToSearch);
         fetchInsuranceData(plateToSearch);
         fetchSunarpData(plateToSearch);
+        fetchApesegSoatData(plateToSearch);
       } else {
         setTimeout(() => {
           setIsLoading(false);
@@ -225,6 +257,7 @@ const SearchPlate = ({ initialPlate }) => {
           fetchInspectionData(plateToSearch);
           fetchInsuranceData(plateToSearch);
           fetchSunarpData(plateToSearch);
+          fetchApesegSoatData(plateToSearch);
         }, 5000);
       }
     }
@@ -266,6 +299,8 @@ const SearchPlate = ({ initialPlate }) => {
     setIsLoadingInsurance(false);
     setSunarpData(null);
     setIsLoadingSunarp(false);
+    setApesegSoatData(null);
+    setIsLoadingApesegSoat(false);
   };
 
   const handleShowInspectionDetails = (inspection) => {
@@ -341,11 +376,17 @@ const SearchPlate = ({ initialPlate }) => {
           <SunarpTimeline
             sunarpData={sunarpData}
             insuranceData={insuranceData}
+            apesegSoatData={apesegSoatData}
           />
 
           <SunarpCard
             sunarpData={sunarpData}
             isLoading={isLoadingSunarp}
+          />
+
+          <ApesegSoatCard
+            apesegSoatData={apesegSoatData}
+            isLoading={isLoadingApesegSoat}
           />
 
           <InsuranceCard

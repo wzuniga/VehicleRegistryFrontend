@@ -101,7 +101,7 @@ const InspectionTableCard = ({ inspectionData, isLoading, onShowDetails }) => {
               </tr>
             </thead>
             <tbody>
-              {(showAllInspections ? inspectionData : inspectionData.slice(0, 2)).map((inspection, index) => (
+              {(showAllInspections ? inspectionData : inspectionData.slice(0, 1)).map((inspection, index) => (
                 <tr key={index} className={inspection.ESTADO === 'VIGENTE' ? 'row-vigente' : inspection.ESTADO ? '' : 'row-desaprobado'}>
                   <td>
                     {inspection.ESTADO && inspection.ESTADO.trim() !== '' && (
@@ -128,33 +128,28 @@ const InspectionTableCard = ({ inspectionData, isLoading, onShowDetails }) => {
                   </td>
                 </tr>
               ))}
-              {inspectionData.length > 2 && !showAllInspections && (
-                <tr className="show-more-row">
-                  <td colSpan="5">
-                    <button className="show-more-btn" onClick={() => setShowAllInspections(true)}>
-                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                        <polyline points="6 9 12 15 18 9"></polyline>
-                      </svg>
-                      Mostrar {inspectionData.length - 2} inspecciones más
-                    </button>
-                  </td>
-                </tr>
-              )}
-              {showAllInspections && inspectionData.length > 2 && (
-                <tr className="show-more-row">
-                  <td colSpan="5">
-                    <button className="show-more-btn" onClick={() => setShowAllInspections(false)}>
-                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                        <polyline points="18 15 12 9 6 15"></polyline>
-                      </svg>
-                      Mostrar menos
-                    </button>
-                  </td>
-                </tr>
-              )}
             </tbody>
           </table>
         </div>
+        {inspectionData.length > 1 && (
+          <div className="show-more-container">
+            {!showAllInspections ? (
+              <button className="show-more-btn" onClick={() => setShowAllInspections(true)}>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <polyline points="6 9 12 15 18 9"></polyline>
+                </svg>
+                Mostrar {inspectionData.length - 1} inspecciones más
+              </button>
+            ) : (
+              <button className="show-more-btn" onClick={() => setShowAllInspections(false)}>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <polyline points="18 15 12 9 6 15"></polyline>
+                </svg>
+                Mostrar menos
+              </button>
+            )}
+          </div>
+        )}
       </div>
     </div>
   );

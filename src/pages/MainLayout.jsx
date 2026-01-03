@@ -29,8 +29,10 @@ const MainLayout = () => {
 
   const handleMenuClick = (pageName) => {
     setCurrentPage(pageName);
-    // Clear selected plate when manually navigating IF needed, 
-    // but maybe user wants to keep context. For now, let's keep it simple.
+    // Cerrar el sidebar en modo móvil cuando se selecciona una opción
+    if (window.innerWidth <= 768) {
+      setIsSidebarOpen(false);
+    }
   };
 
   const handleSelectPlate = (plate) => {

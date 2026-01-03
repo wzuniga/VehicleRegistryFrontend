@@ -107,7 +107,7 @@ const SunarpCard = ({ sunarpData, isLoading }) => {
               </tr>
             </thead>
             <tbody>
-              {(showAll ? sortedData : sortedData.slice(0, 2)).map((record, index) => (
+              {(showAll ? sortedData : sortedData.slice(0, 1)).map((record, index) => (
                 <tr key={record.id} className={index === 0 ? 'latest-record' : ''}>
                   <td>{formatDate(record.registrationDate)}</td>
                   <td className="category-text">{record.category}</td>
@@ -130,33 +130,28 @@ const SunarpCard = ({ sunarpData, isLoading }) => {
                   {/* <td className="notes">{record.notes || '-'}</td> */}
                 </tr>
               ))}
-              {sortedData.length > 2 && !showAll && (
-                <tr className="show-more-row">
-                  <td colSpan="4">
-                    <button className="show-more-btn" onClick={() => setShowAll(true)}>
-                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                        <polyline points="6 9 12 15 18 9"></polyline>
-                      </svg>
-                      Mostrar {sortedData.length - 2} registros más
-                    </button>
-                  </td>
-                </tr>
-              )}
-              {showAll && sortedData.length > 2 && (
-                <tr className="show-more-row">
-                  <td colSpan="4">
-                    <button className="show-more-btn" onClick={() => setShowAll(false)}>
-                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                        <polyline points="18 15 12 9 6 15"></polyline>
-                      </svg>
-                      Mostrar menos
-                    </button>
-                  </td>
-                </tr>
-              )}
             </tbody>
           </table>
         </div>
+        {sortedData.length > 1 && (
+          <div className="show-more-container">
+            {!showAll ? (
+              <button className="show-more-btn" onClick={() => setShowAll(true)}>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <polyline points="6 9 12 15 18 9"></polyline>
+                </svg>
+                Mostrar {sortedData.length - 1} registros más
+              </button>
+            ) : (
+              <button className="show-more-btn" onClick={() => setShowAll(false)}>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <polyline points="18 15 12 9 6 15"></polyline>
+                </svg>
+                Mostrar menos
+              </button>
+            )}
+          </div>
+        )}
       </div>
     </div>
   );

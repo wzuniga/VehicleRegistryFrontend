@@ -1,17 +1,21 @@
 import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import SearchPlate from '../components/SearchPlate';
 import SearchHistory from '../components/SearchHistory';
 import './MainLayout.css';
 
 const MainLayout = () => {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const [isSidebarOpen, setIsSidebarOpen] = useState(() => {
     // En móvil (max-width: 768px), el sidebar inicia cerrado
     return window.innerWidth > 768;
   });
   const [currentPage, setCurrentPage] = useState('Busca tu Placa');
-  const [selectedPlate, setSelectedPlate] = useState(null);
+  const [selectedPlate, setSelectedPlate] = useState(() => {
+    // Obtener plate de los query params
+    return searchParams.get('plate') || null;
+  });
 
   useEffect(() => {
     const handleResize = () => {

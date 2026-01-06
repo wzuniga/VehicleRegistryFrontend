@@ -12,7 +12,7 @@
   top: 0;
   left: 0;
   right: 0;
-  background: rgba(30, 41, 59, 0.95);
+  background: #e7e8f4;
   backdrop-filter: blur(10px);
   border-bottom: 1px solid rgba(255, 255, 255, 0.1);
   z-index: 1000;
@@ -56,7 +56,7 @@
 }
 
 .nav-link {
-  color: rgba(255, 255, 255, 0.85);
+  color: #1e293b;
   text-decoration: none;
   font-weight: 500;
   font-size: 1rem;
@@ -99,6 +99,138 @@
 .nav-btn:hover {
   transform: translateY(-2px);
   box-shadow: 0 6px 20px rgba(96, 165, 250, 0.4);
+}
+
+/* Main Search Section */
+.main-search-section {
+  min-height: 100vh;
+  padding-top: 80px;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  position: relative;
+  background: linear-gradient(180deg, #e7e8f4 0%, #e7e8f4 80%, #ffffff 80%, #ffffff 100%);
+}
+
+.main-search-container {
+  /* max-width: 900px; */
+  margin: 0 auto;
+  padding: 0 6%;
+  text-align: center;
+  z-index: 2;
+  padding-top: 6rem;
+}
+
+.main-search-title {
+  font-size: 3.5rem;
+  font-weight: 800;
+  color: #1e293b;
+  margin-bottom: 1.5rem;
+  line-height: 1.2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.search-icon {
+  font-size: 3.5rem;
+}
+
+.main-search-subtitle {
+  font-size: 1.4rem;
+  color: #475569;
+  margin-bottom: 3.5rem;
+  line-height: 1.6;
+  font-weight: 500;
+}
+
+.main-search-form {
+  width: 100%;
+}
+
+.main-search-input-group {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  max-width: 550px;
+  margin: 0 auto;
+  background: white;
+  padding: 0.5rem;
+  border-radius: 60px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+}
+
+.main-search-input {
+  flex: 1;
+  padding: 1rem 1.5rem;
+  font-size: 1.3rem;
+  border: none;
+  border-radius: 60px;
+  outline: none;
+  transition: all 0.3s ease;
+  text-transform: uppercase;
+  letter-spacing: 3px;
+  font-weight: 700;
+  background: transparent;
+  color: #1e293b;
+  text-align: center;
+}
+
+.main-search-input:focus {
+  background: #f8fafc;
+}
+
+.main-search-input::placeholder {
+  text-transform: none;
+  letter-spacing: normal;
+  font-weight: 500;
+  color: #94a3b8;
+}
+
+.main-search-btn {
+  width: 50px;
+  height: 50px;
+  font-size: 1.8rem;
+  font-weight: 700;
+  background: #3b82f6;
+  color: white;
+  border: none;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 8px 25px rgba(59, 130, 246, 0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.main-search-btn:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 12px 35px rgba(59, 130, 246, 0.5);
+}
+
+.main-search-btn:active {
+  transform: translateY(-1px);
+}
+
+.car-image-container {
+  position: absolute;
+  top: 70%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 10;
+  max-width: 900px;
+  width: 90%;
+}
+
+.car-image {
+  width: 100%;
+  height: auto;
+  display: block;
+  filter: drop-shadow(0 20px 40px rgba(0, 0, 0, 0.2));
 }
 
 /* Hero Section */
@@ -734,6 +866,60 @@ html {
     font-size: 0.85rem;
   }
 
+  .main-search-section {
+    min-height: 100vh;
+    padding-top: 80px;
+    background: #e7e8f4;
+  }
+
+  .main-search-container {
+    padding: 0 5%;
+    padding-top: 9rem;
+  }
+
+  .main-search-title {
+    font-size: 2.2rem;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .search-icon {
+    font-size: 2.8rem;
+  }
+
+  .main-search-subtitle {
+    font-size: 1.15rem;
+    margin-bottom: 2.5rem;
+  }
+
+  .main-search-input-group {
+    gap: 0.3rem;
+    padding: 0.4rem;
+    border-radius: 50px;
+    max-width: 300px;
+  }
+
+  .main-search-input {
+    padding: 0.85rem 1rem;
+    font-size: 1rem;
+    letter-spacing: 1.5px;
+  }
+
+  .main-search-btn {
+    width: 44px;
+    height: 44px;
+  }
+
+  .main-search-btn svg {
+    width: 18px;
+    height: 18px;
+  }
+
+  .car-image-container {
+    max-width: 450px;
+    top: calc(70% + 2rem);
+  }
+
   .hero-title {
     font-size: 2rem;
     line-height: 1.2;
@@ -868,6 +1054,51 @@ html {
   
   .quick-search-subtitle {
     font-size: 0.95rem;
+  }
+
+  .main-search-section {
+    min-height: 100vh;
+    padding-top: 70px;
+    background: #e7e8f4;
+  }
+
+  .main-search-container {
+    padding: 0 4%;
+    padding-top: 7rem;
+  }
+
+  .main-search-title {
+    font-size: 1.8rem;
+  }
+
+  .search-icon {
+    font-size: 2.3rem;
+  }
+
+  .main-search-subtitle {
+    font-size: 1.05rem;
+    margin-bottom: 2rem;
+  }
+
+  .main-search-input {
+    padding: 0.8rem 0.9rem;
+    font-size: 0.95rem;
+    letter-spacing: 1px;
+  }
+
+  .main-search-btn {
+    width: 42px;
+    height: 42px;
+  }
+
+  .main-search-btn svg {
+    width: 16px;
+    height: 16px;
+  }
+
+  .car-image-container {
+    max-width: 350px;
+    top: calc(70% + 2rem);
   }
 
   .section-title {

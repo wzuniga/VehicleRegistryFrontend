@@ -1,6 +1,7 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import MainLayout from './pages/MainLayout';
 import AddCarPlate from './pages/AddCarPlate';
+import LandingPage from './pages/LandingPage';
 import './App.css';
 
 import { WarningProvider } from './context/WarningContext';
@@ -11,7 +12,8 @@ function App() {
     <WarningProvider>
       <Router>
         <Routes>
-          <Route path="/" element={<MainLayout />} />
+          <Route path="/" element={<LandingPage />} />
+          <Route path="/search" element={<MainLayout />} />
           <Route path="/addcarplate" element={<AddCarPlate />} />
         </Routes>
       </Router>

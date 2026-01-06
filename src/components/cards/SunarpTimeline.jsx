@@ -248,7 +248,22 @@ const SunarpTimeline = ({ sunarpData, insuranceData, apesegSoatData }) => {
 
     // Combine Data Logic
     // We do this calculation every render. Could use useMemo if performance issues arise.
-    let combinedData = [...(sunarpData || [])];
+    let combinedData = [...(sunarpData || [])].map(record => {
+        // Check if participants contain insurance-related keywords
+        const naturalUpper = (record.naturalParticipants || '').toUpperCase();
+        const legalUpper = (record.legalParticipants || '').toUpperCase();
+        const hasInsuranceKeywords = 
+            naturalUpper.includes('PACIFICO') || naturalUpper.includes('SEGUROS') || naturalUpper.includes('REASEGUROS') ||
+            legalUpper.includes('PACIFICO') || legalUpper.includes('SEGUROS') || legalUpper.includes('REASEGUROS');
+        
+        return {
+            ...record,
+            isInsuranceRelated: hasInsuranceKeywords,
+            notes: hasInsuranceKeywords 
+                ? 'Posible compra por compañía de seguros - el vehículo pudo haber sido declarado como pérdida total por accidente.'
+                : record.notes
+        };
+    });
 
     if (insuranceData) {
         const soatRecords = parseInsuranceHtml(insuranceData.soatTableDetails);
@@ -513,7 +528,8 @@ const SunarpTimeline = ({ sunarpData, insuranceData, apesegSoatData }) => {
                                 const isDanger = actTypeUpper.includes('ANOTACIÓN DE EMBARGO') ||
                                     actTypeUpper.includes('ANOTACION DE EMBARGO') ||
                                     categoryUpper.includes('REEMPLACAMIENTO') ||
-                                    record.isAccident;
+                                    record.isAccident ||
+                                    record.isInsuranceRelated;
 
                                 let itemClass = 'timeline-item';
                                 if (isDanger) itemClass += ' danger';
@@ -523,6 +539,7 @@ const SunarpTimeline = ({ sunarpData, insuranceData, apesegSoatData }) => {
                                 if (record.isExpiredSoat) itemClass += ' expired-soat-node';
                                 if (record.isTaxiWarning) itemClass += ' taxi-warning-node';
                                 if (record.isCatWarning) itemClass += ' cat-warning-node';
+                                if (record.isInsuranceRelated) itemClass += ' insurance-related-node';
 
                                 return (
                                     <div
@@ -536,7 +553,7 @@ const SunarpTimeline = ({ sunarpData, insuranceData, apesegSoatData }) => {
                                                 onMouseEnter={(e) => handleMouseEnter(e, record)}
                                                 onMouseLeave={handleMouseLeave}
                                             >
-                                                {record.isAccident && (
+                                                {(record.isAccident || record.isInsuranceRelated) && (
                                                     <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round" style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)' }}>
                                                         <line x1="18" y1="6" x2="6" y2="18"></line>
                                                         <line x1="6" y1="6" x2="18" y2="18"></line>
@@ -602,10 +619,11 @@ const SunarpTimeline = ({ sunarpData, insuranceData, apesegSoatData }) => {
                         <span className="popup-date">{formatDate(hoveredRecord.registrationDate)}</span>
                         <span className="popup-category">
                             {hoveredRecord.category}
-                            {hoveredRecord.isAccident && <span style={{ marginLeft: '8px', fontSize: '0.7em', background: '#e12305', color: 'white', padding: '2px 6px', borderRadius: '4px' }}>PELIGRO</span>}
+                            {hoveredRecord.isAccident && <span style={{ marginLeft: '8px', fontSize: '0.7em', background: '#e12305', color: 'white', padding: '2px 6px', borderRadius: '4px' }}>SINIESTRO</span>}
                             {hoveredRecord.isExpiredSoat && <span style={{ marginLeft: '8px', fontSize: '0.7em', background: '#d19700', color: 'white', padding: '2px 6px', borderRadius: '4px' }}>VENCIDO</span>}
                             {hoveredRecord.isTaxiWarning && <span style={{ marginLeft: '8px', fontSize: '0.7em', background: '#d19700', color: 'white', padding: '2px 6px', borderRadius: '4px' }}>TAXI</span>}
-                            {hoveredRecord.isCatWarning && <span style={{ marginLeft: '8px', fontSize: '0.7em', background: '#d19700', color: 'white', padding: '2px 6px', borderRadius: '4px' }}>CAT</span>}
+                            {hoveredRecord.isCatWarning && <span style={{ marginLeft: '8px', fontSize: '0.7em', background: '#d19700', color: 'white', padding: '2px 6px', borderRadius: '4px' }}>TAXI</span>}
+                            {hoveredRecord.isInsuranceRelated && <span style={{ marginLeft: '8px', fontSize: '0.7em', background: '#e12305', color: 'white', padding: '2px 6px', borderRadius: '4px' }}>COMPAÑÍA DE SEGUROS</span>}
                         </span>
                     </div>
                     <div className="popup-body">

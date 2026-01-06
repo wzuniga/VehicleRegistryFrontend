@@ -25,18 +25,20 @@
   width: 100%;
   padding: 1.25rem 4rem 1.25rem 1.5rem;
   font-size: 1.125rem;
-  border: 2px solid #e2e8f0;
+  border: 2px solid #cbd5e1;
   border-radius: 12px;
   outline: none;
   transition: all 0.3s ease;
   text-transform: uppercase;
   letter-spacing: 2px;
   font-weight: 500;
+  background: white;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 
 .search-input:focus {
-  border-color: #1e293b;
-  box-shadow: 0 0 0 4px rgba(30, 41, 59, 0.1);
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
 }
 
 .search-input::placeholder {

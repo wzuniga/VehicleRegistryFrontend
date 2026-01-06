@@ -1,9 +1,11 @@
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import SearchPlate from '../components/SearchPlate';
 import SearchHistory from '../components/SearchHistory';
 import './MainLayout.css';
 
 const MainLayout = () => {
+  const navigate = useNavigate();
   const [isSidebarOpen, setIsSidebarOpen] = useState(() => {
     // En móvil (max-width: 768px), el sidebar inicia cerrado
     return window.innerWidth > 768;
@@ -40,6 +42,15 @@ const MainLayout = () => {
     setCurrentPage('Busca tu Placa');
   };
 
+  const handleWhatsApp = () => {
+    const message = encodeURIComponent('Hola, quiero solicitar un informe vehicular completo');
+    window.open(`https://wa.me/51959314336?text=${message}`, '_blank');
+  };
+
+  const handleLogout = () => {
+    navigate('/');
+  };
+
   return (
     <div className="main-layout">
       {/* Navbar Superior */}
@@ -48,7 +59,7 @@ const MainLayout = () => {
           <button className="menu-toggle" onClick={toggleSidebar}>
             ☰
           </button>
-          <h1 className="navbar-title">{currentPage}</h1>
+          <h1 className="navbar-title">Auto Check</h1>
           <div className="navbar-actions">
             <div className="user-profile">
               <div className="avatar">
@@ -113,7 +124,14 @@ const MainLayout = () => {
             <div className="sidebar-footer">
               <ul className="sidebar-menu-bottom">
                 <li>
-                  <a href="#" className="sidebar-link">
+                  <a 
+                    href="#" 
+                    className="sidebar-link"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      handleWhatsApp();
+                    }}
+                  >
                     <span className="icon">
                       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                         <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
@@ -123,7 +141,14 @@ const MainLayout = () => {
                   </a>
                 </li>
                 <li>
-                  <a href="#" className="sidebar-link">
+                  <a 
+                    href="#" 
+                    className="sidebar-link"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      handleLogout();
+                    }}
+                  >
                     <span className="icon">
                       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                         <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>

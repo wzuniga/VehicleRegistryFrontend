@@ -183,7 +183,7 @@ function LandingPage() {
         <div className="features-grid">
           <div className="feature-card highlight feature-card-wide">
             <div className="feature-icon">
-              <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+              <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
                 <line x1="16" y1="2" x2="16" y2="6"></line>
                 <line x1="8" y1="2" x2="8" y2="6"></line>
@@ -195,9 +195,9 @@ function LandingPage() {
           </div>
           <div className="feature-card">
             <div className="feature-icon">
-              <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#213547" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
-                <circle cx="12" cy="7" r="4"></circle>
+              <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#213547" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <circle cx="12" cy="8" r="5"></circle>
+                <path d="M20 21a8 8 0 0 0-16 0"></path>
               </svg>
             </div>
             <h3>Datos del propietario</h3>
@@ -205,9 +205,11 @@ function LandingPage() {
           </div>
           <div className="feature-card">
             <div className="feature-icon">
-              <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#213547" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path>
-                <rect x="8" y="2" width="8" height="4" rx="1" ry="1"></rect>
+              <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#213547" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"></path>
+                <rect x="9" y="3" width="6" height="4" rx="1"></rect>
+                <line x1="9" y1="12" x2="15" y2="12"></line>
+                <line x1="9" y1="16" x2="15" y2="16"></line>
               </svg>
             </div>
             <h3>Historial completo</h3>
@@ -215,9 +217,11 @@ function LandingPage() {
           </div>
           <div className="feature-card">
             <div className="feature-icon">
-              <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#213547" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-                <line x1="12" y1="1" x2="12" y2="23"></line>
-                <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
+              <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#213547" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <circle cx="12" cy="12" r="10"></circle>
+                <path d="M16 8h-4a2 2 0 0 0 0 4h2a2 2 0 0 1 0 4H8"></path>
+                <line x1="12" y1="6" x2="12" y2="8"></line>
+                <line x1="12" y1="16" x2="12" y2="18"></line>
               </svg>
             </div>
             <h3>Multas y obligaciones</h3>
@@ -225,8 +229,9 @@ function LandingPage() {
           </div>
           <div className="feature-card">
             <div className="feature-icon">
-              <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#213547" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+              <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#213547" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+                <polyline points="9 12 11 14 15 10"></polyline>
               </svg>
             </div>
             <h3>SOAT vigente</h3>
@@ -234,7 +239,7 @@ function LandingPage() {
           </div>
           <div className="feature-card">
             <div className="feature-icon">
-              <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#213547" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+              <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#213547" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"></path>
               </svg>
             </div>
@@ -243,12 +248,12 @@ function LandingPage() {
           </div>
           <div className="feature-card">
             <div className="feature-icon">
-              <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#213547" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-                <line x1="12" y1="3" x2="12" y2="18"></line>
-                <path d="M8 18h8"></path>
-                <path d="M5 21h14"></path>
-                <path d="M19 6h-2.5a2 2 0 0 1-2-2V2"></path>
-                <path d="M5 6h2.5a2 2 0 0 0 2-2V2"></path>
+              <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#213547" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <line x1="12" y1="3" x2="12" y2="21"></line>
+                <path d="M3 7h6l3-4 3 4h6"></path>
+                <circle cx="6" cy="10" r="3"></circle>
+                <circle cx="18" cy="10" r="3"></circle>
+                <line x1="8" y1="21" x2="16" y2="21"></line>
               </svg>
             </div>
             <h3>Cargas y gravámenes</h3>
@@ -256,24 +261,27 @@ function LandingPage() {
           </div>
           <div className="feature-card">
             <div className="feature-icon">
-              <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#213547" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
-                <line x1="12" y1="9" x2="12" y2="13"></line>
-                <line x1="12" y1="17" x2="12.01" y2="17"></line>
-              </svg>
+              <svg width="48" height="48" viewBox="0 0 24 24" fill="none" 
+     stroke="#213547" stroke-width="1.5" 
+     stroke-linecap="round" stroke-linejoin="round">
+  <path d="M12 3v17" />
+  <path d="M8 21h8" />
+  
+  <path d="M3 7h18" />
+  
+  <path d="M6 7l-3 6h6l-3 -6" /> <path d="M3 13a3 3 0 0 0 6 0" /> <path d="M18 7l-3 6h6l-3 -6" /> <path d="M15 13a3 3 0 0 0 6 0" /> </svg>
+
             </div>
             <h3>Órdenes judiciales</h3>
             <p>Verifica si existe alguna orden de captura o denuncia</p>
           </div>
           <div className="feature-card">
             <div className="feature-icon">
-              <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#213547" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M5 17h14v5H5z"></path>
-                <path d="M5 17l-2-4.5V8h2.5"></path>
-                <path d="M19 17l2-4.5V8h-2.5"></path>
-                <path d="M6 8V6a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v2"></path>
-                <circle cx="7" cy="17" r="1"></circle>
-                <circle cx="17" cy="17" r="1"></circle>
+              <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#213547" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M19 17h2c.6 0 1-.4 1-1v-3c0-.9-.7-1.7-1.5-1.9C18.7 10.6 16 10 16 10s-1.3-1.4-2.2-2.3c-.5-.4-1.1-.7-1.8-.7H5c-.6 0-1.1.4-1.4.9l-1.4 2.9A3.7 3.7 0 0 0 2 12v4c0 .6.4 1 1 1h2"></path>
+                <circle cx="7" cy="17" r="2"></circle>
+                <path d="M9 17h6"></path>
+                <circle cx="17" cy="17" r="2"></circle>
               </svg>
             </div>
             <h3>Uso comercial</h3>
@@ -281,10 +289,13 @@ function LandingPage() {
           </div>
           <div className="feature-card">
             <div className="feature-icon">
-              <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#213547" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-                <circle cx="12" cy="12" r="10"></circle>
-                <line x1="12" y1="8" x2="12" y2="12"></line>
-                <line x1="12" y1="16" x2="12.01" y2="16"></line>
+              <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#213547" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="m21 8-2 2-1.5-3.7A2 2 0 0 0 15.646 5H8.4a2 2 0 0 0-1.903 1.257L5 10 3 8"></path>
+                <path d="M7 14h.01"></path>
+                <path d="M17 14h.01"></path>
+                <rect width="18" height="8" x="3" y="10" rx="2"></rect>
+                <path d="M5 18v2"></path>
+                <path d="M19 18v2"></path>
               </svg>
             </div>
             <h3>Accidentes reportados</h3>
@@ -304,7 +315,7 @@ function LandingPage() {
         <div className="benefits-grid">
           <div className="benefit-card">
             <div className="benefit-icon">
-              <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="#213547" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+              <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="#213547" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <path d="M9.5 2A2.5 2.5 0 0 1 12 4.5v15a2.5 2.5 0 0 1-4.96.44 2.5 2.5 0 0 1-2.96-3.08 3 3 0 0 1-.34-5.58 2.5 2.5 0 0 1 1.32-4.24 2.5 2.5 0 0 1 1.98-3A2.5 2.5 0 0 1 9.5 2Z"></path>
                 <path d="M14.5 2A2.5 2.5 0 0 0 12 4.5v15a2.5 2.5 0 0 0 4.96.44 2.5 2.5 0 0 0 2.96-3.08 3 3 0 0 0 .34-5.58 2.5 2.5 0 0 0-1.32-4.24 2.5 2.5 0 0 0-1.98-3A2.5 2.5 0 0 0 14.5 2Z"></path>
               </svg>
@@ -314,7 +325,7 @@ function LandingPage() {
           </div>
           <div className="benefit-card">
             <div className="benefit-icon">
-              <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="#213547" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+              <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="#213547" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
               </svg>
             </div>
@@ -323,7 +334,7 @@ function LandingPage() {
           </div>
           <div className="benefit-card">
             <div className="benefit-icon">
-              <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="#213547" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+              <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="#213547" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <line x1="18" y1="20" x2="18" y2="10"></line>
                 <line x1="12" y1="20" x2="12" y2="4"></line>
                 <line x1="6" y1="20" x2="6" y2="14"></line>

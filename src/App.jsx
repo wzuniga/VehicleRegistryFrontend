@@ -2,6 +2,7 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import MainLayout from './pages/MainLayout';
 import AddCarPlate from './pages/AddCarPlate';
 import LandingPage from './pages/LandingPage';
+import ManualFilter from './pages/ManualFilter';
 import './App.css';
 
 import { WarningProvider } from './context/WarningContext';
@@ -15,6 +16,7 @@ function App() {
           <Route path="/" element={<LandingPage />} />
           <Route path="/search" element={<MainLayout />} />
           <Route path="/addcarplate" element={<AddCarPlate />} />
+          <Route path="/manualfilter" element={<ManualFilter />} />
         </Routes>
       </Router>
       <WarningModal />

@@ -244,7 +244,7 @@
   padding: 6rem 6% 2rem;
   gap: 4rem;
   position: relative;
-  background: linear-gradient(135deg, #0f172a 0%, #1e293b 40%, #334155 100%);
+  background: linear-gradient(0deg, #0f172a 0%, #1e293b 40%, #334155 100%);
 }
 
 .hero-content {

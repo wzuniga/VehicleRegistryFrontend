@@ -1,0 +1,383 @@
+/* =============================================
+   VEHICLE TIMELINE — vtl namespace
+   ============================================= */
+
+.vtl-wrapper {
+  background: white;
+  border: 1.5px solid #e2e8f0;
+  border-radius: 12px;
+  overflow: visible;
+  margin-bottom: 1.25rem;
+  font-family: 'Inter', system-ui, sans-serif;
+  position: relative;
+}
+
+/* ---- Toolbar ---- */
+.vtl-toolbar {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.75rem 1rem 0.5rem;
+  border-bottom: 1px solid #f1f5f9;
+  flex-wrap: wrap;
+}
+
+.vtl-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 0.9rem;
+  flex: 1;
+  min-width: 0;
+}
+
+.vtl-legend__item {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  font-size: 0.72rem;
+  font-weight: 500;
+  white-space: nowrap;
+  color: #64748b;
+}
+
+.vtl-legend__item svg {
+  flex-shrink: 0;
+}
+
+.vtl-controls {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  flex-shrink: 0;
+}
+
+.vtl-filter-label {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  font-size: 0.78rem;
+  font-weight: 500;
+  color: #475569;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.vtl-filter-label input[type='radio'] {
+  accent-color: #3b82f6;
+  cursor: pointer;
+}
+
+.vtl-reset-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.3rem 0.65rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #475569;
+  background: #f1f5f9;
+  border: 1px solid #e2e8f0;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.18s ease;
+  font-family: inherit;
+}
+
+.vtl-reset-btn:hover {
+  background: #e2e8f0;
+  color: #1e293b;
+}
+
+/* ---- Hint ---- */
+.vtl-hint {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.72rem;
+  color: #94a3b8;
+  margin: 0;
+  padding: 0.3rem 1rem 0;
+  font-style: italic;
+}
+
+/* ---- Track ---- */
+.vtl-track {
+  position: relative;
+  width: 100%;
+  overflow: visible;
+  cursor: crosshair;
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: none;
+  box-sizing: border-box;
+}
+
+/* ---- Axis ticks ---- */
+.vtl-tick {
+  position: absolute;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  pointer-events: none;
+}
+
+.vtl-tick__mark {
+  width: 1px;
+  height: 8px;
+  background: #cbd5e1;
+  margin-bottom: 2px;
+}
+
+.vtl-tick__label {
+  font-size: 0.68rem;
+  color: #94a3b8;
+  white-space: nowrap;
+  margin-top: 2px;
+  font-weight: 500;
+  font-family: 'Inter', system-ui, sans-serif;
+}
+
+/* ---- Timeline bar ---- */
+.vtl-line {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, #e2e8f0 0%, #cbd5e1 50%, #e2e8f0 100%);
+  border-radius: 2px;
+  pointer-events: none;
+  transform: translateY(-50%);
+}
+
+/* ---- Today marker ---- */
+.vtl-today {
+  position: absolute;
+  transform: translateX(-50%);
+  pointer-events: none;
+}
+
+.vtl-today__line {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 2px;
+  background: #3b82f6;
+  opacity: 0.55;
+  border-radius: 1px;
+}
+
+.vtl-today__label {
+  position: absolute;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 0.6rem;
+  font-weight: 700;
+  color: #3b82f6;
+  white-space: nowrap;
+  background: white;
+  padding: 1px 5px;
+  border-radius: 8px;
+  border: 1.5px solid #3b82f6;
+  line-height: 1.4;
+  z-index: 10;
+}
+
+/* ---- Connector ---- */
+.vtl-connector {
+  position: absolute;
+  width: 2px;
+  opacity: 0.4;
+  pointer-events: none;
+  border-radius: 1px;
+}
+
+/* ---- Event node ---- */
+.vtl-node {
+  position: absolute;
+  transform: translateX(-50%);
+  cursor: pointer;
+  transition: transform 0.15s ease, filter 0.15s ease;
+  border-radius: 50%;
+  padding: 3px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: white;
+  box-shadow: 0 1px 6px rgba(0, 0, 0, 0.12), 0 0 0 2px var(--node-color, #3b82f6);
+}
+
+.vtl-node:hover {
+  transform: translateX(-50%) scale(1.18);
+  filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.22));
+  z-index: 10;
+}
+
+.vtl-node:focus-visible {
+  outline: 2px solid #3b82f6;
+  outline-offset: 3px;
+}
+
+.vtl-node--selected {
+  transform: translateX(-50%) scale(1.22) !important;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.22), 0 0 0 3px var(--node-color, #3b82f6);
+  z-index: 20;
+}
+
+/* ---- Popup ---- */
+.vtl-popup {
+  position: absolute;
+  background: white;
+  border: 1.5px solid #e2e8f0;
+  border-radius: 10px;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.14);
+  z-index: 200;
+  animation: vtl-popup-in 0.15s ease;
+  pointer-events: auto;
+}
+
+@keyframes vtl-popup-in {
+  from { opacity: 0; transform: scale(0.96) translateY(4px); }
+  to   { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+.vtl-popup__header {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.55rem 0.75rem;
+  border-bottom: 2px solid;
+  border-radius: 8px 8px 0 0;
+  background: #f8fafc;
+}
+
+.vtl-popup__title {
+  flex: 1;
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: #1e293b;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.vtl-popup__close {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #94a3b8;
+  padding: 2px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+  transition: color 0.15s, background 0.15s;
+  flex-shrink: 0;
+}
+
+.vtl-popup__close:hover {
+  color: #475569;
+  background: #e2e8f0;
+}
+
+.vtl-popup__body {
+  padding: 0.5rem 0.75rem 0.65rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.28rem;
+}
+
+.vtl-popup__row {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+}
+
+.vtl-popup__key {
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: #94a3b8;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+  white-space: nowrap;
+  padding-top: 0.1em;
+  flex-shrink: 0;
+  min-width: 65px;
+}
+
+.vtl-popup__val {
+  font-size: 0.78rem;
+  color: #1e293b;
+  font-weight: 500;
+  line-height: 1.4;
+  word-break: break-word;
+}
+
+/* ---- Drag selection box ---- */
+.vtl-selection {
+  position: absolute;
+  background: rgba(59, 130, 246, 0.08);
+  border: 1.5px solid rgba(59, 130, 246, 0.4);
+  border-radius: 4px;
+  pointer-events: none;
+  z-index: 5;
+}
+
+/* ---- Empty state ---- */
+.vtl-empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.65rem;
+  padding: 1.5rem 1rem;
+  color: #94a3b8;
+  font-size: 0.875rem;
+  font-style: italic;
+  background: white;
+  border: 1.5px dashed #e2e8f0;
+  border-radius: 12px;
+  margin-bottom: 1.25rem;
+}
+
+/* =============================================
+   RESPONSIVE — Mobile (≤768px)
+   ============================================= */
+@media (max-width: 768px) {
+  .vtl-toolbar {
+    flex-direction: column;
+    gap: 0.5rem;
+    padding: 0.65rem 0.75rem 0.4rem;
+  }
+
+  .vtl-legend {
+    gap: 0.35rem 0.65rem;
+  }
+
+  .vtl-legend__item {
+    font-size: 0.68rem;
+  }
+
+  .vtl-controls {
+    width: 100%;
+    justify-content: flex-end;
+    gap: 0.5rem;
+  }
+
+  .vtl-filter-label {
+    font-size: 0.74rem;
+  }
+
+  .vtl-hint {
+    font-size: 0.68rem;
+    padding: 0.25rem 0.75rem 0;
+  }
+
+  .vtl-popup {
+    font-size: 0.8rem;
+  }
+
+  .vtl-popup__title {
+    font-size: 0.78rem;
+  }
+}

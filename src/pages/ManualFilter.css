@@ -11,7 +11,7 @@
   top: 0;
   left: 0;
   right: 0;
-  background: rgba(231, 232, 244, 0.95);
+  background: #0f172a;
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
   box-shadow: 0 2px 20px rgba(0, 0, 0, 0.1);
@@ -36,7 +36,7 @@
 .logo-text {
   font-size: 1.5rem;
   font-weight: 700;
-  background: linear-gradient(135deg, #60a5fa 0%, #a78bfa 100%);
+  background: #3b82f6;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -50,7 +50,7 @@
 
 .nav-btn {
   padding: 0.625rem 1.5rem;
-  background: linear-gradient(135deg, #60a5fa 0%, #a78bfa 100%);
+  background: #3b82f6;
   color: white;
   border: none;
   border-radius: 8px;
@@ -79,7 +79,7 @@
 .hero-title {
   font-size: 3.5rem;
   font-weight: 800;
-  background: linear-gradient(135deg, #60a5fa 0%, #a78bfa 100%);
+  background: #3b82f6;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -91,7 +91,7 @@
 /* Access Section */
 .access-section {
   padding: 60px 6%;
-  background: rgba(255, 255, 255, 0.03);
+  background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
 }
 
 .access-container {
@@ -119,7 +119,7 @@
 }
 
 .service-card {
-  background: rgba(255, 255, 255, 0.05);
+  background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
   border-radius: 16px;
   padding: 1.5rem;
   text-decoration: none;
@@ -134,7 +134,7 @@
 
 .service-card:hover {
   transform: translateY(-5px);
-  background: rgba(96, 165, 250, 0.1);
+  /* background: rgba(96, 165, 250, 0.1); */
   border-color: rgba(96, 165, 250, 0.3);
   box-shadow: 0 10px 30px rgba(96, 165, 250, 0.2);
 }

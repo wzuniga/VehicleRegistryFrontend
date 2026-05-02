@@ -366,7 +366,10 @@ const NewSearchPage = () => {
 
         if (isOlderThanOneMonth(createdAt)) {
           // Auto-reprocess: data is stale (> 1 month)
-          try { await api.patch(`/pending-car-plates/plate/${target}/reset-all`); } catch { /* continue */ }
+          try {
+            await api.patch(`/pending-car-plates/plate/${target}/reset-all`);
+            await api.patch(`/pending-car-plates/plate/${target}/touch-created-at`);
+          } catch { /* continue */ }
           setProcessedAt(new Date().toISOString());
           fireFetches(target, cfg, 3000);
         } else {

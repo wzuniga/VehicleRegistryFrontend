@@ -271,13 +271,13 @@ function ManualFilter() {
       </section>
 
       {/* Important Notice */}
-      <section className="notice-section">
+      {/* <section className="notice-section">
         <div className="notice-container">
           <p className="notice-text">
             MUY IMPORTANTE: EN CASO DE ALGUNA DUDA, VER LOS TUTORIALES EN LA PARTE DE ABAJO POR FAVOR
           </p>
         </div>
-      </section>
+      </section> */}
 
       {/* Plate Origin Verification */}
       <section className="verification-section">
@@ -298,7 +298,7 @@ function ManualFilter() {
       </section>
 
       {/* Paid Services Section */}
-      <section className="paid-services-section">
+      {/* <section className="paid-services-section">
         <div className="paid-services-container">
           <h2 className="section-title">SERVICIOS Y TRÁMITES PAGADOS</h2>
           
@@ -319,7 +319,7 @@ function ManualFilter() {
             ))}
           </div>
         </div>
-      </section>
+      </section> */}
 
       {/* Province Fines Section */}
       <section className="province-section">
@@ -343,7 +343,7 @@ function ManualFilter() {
       </section>
 
       {/* Tutorials Section */}
-      <section className="tutorials-section">
+      {/* <section className="tutorials-section">
         <div className="tutorials-container">
           <h2 className="section-title">TUTORIALES</h2>
           
@@ -374,10 +374,10 @@ function ManualFilter() {
           </div>
         </div>
         
-      </section>
+      </section> */}
 
       {/* Footer */}
-      <footer className="manual-footer">
+      {/* <footer className="manual-footer">
         <div className="footer-container">
           <p className="footer-text">
             SOMOS ESPECIALISTAS EN EL RUBRO CON MAS DE 10 AÑOS DE EXPERIENCIA
@@ -386,7 +386,7 @@ function ManualFilter() {
             COPYRIGHT © 2025 SUBASTAS VEHICULARES PERU - ESTUDIO SALINAS ALVAREZ - TODOS LOS DERECHOS RESERVADOS.
           </p>
         </div>
-      </footer>
+      </footer> */}
     </div>
   );
 }

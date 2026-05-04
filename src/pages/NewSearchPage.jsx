@@ -462,6 +462,39 @@ const NewSearchPage = () => {
         });
       }
 
+      const cambioPlaca = sunarpData.some((record) => {
+        const cat = (record.category || '').toUpperCase();
+        return cat.includes('CAMBIO DE PLACA');
+      });
+      if (cambioPlaca) {
+        list.push({
+          severity: 'warning',
+          message: 'El vehículo registra cambio de placa en SUNARP',
+        });
+      }
+
+      const adjudicacion = sunarpData.some((record) => {
+        const actType = (record.actType || '').toUpperCase();
+        return actType.includes('ADJUDICACION');
+      });
+      if (adjudicacion) {
+        list.push({
+          severity: 'warning',
+          message: 'El vehículo registra adjudicación en SUNARP — posible subasta',
+        });
+      }
+
+      const medidaCautelar = sunarpData.some((record) => {
+        const actType = (record.actType || '').toUpperCase();
+        return actType.includes('MEDIDA CAUTELAR');
+      });
+      if (medidaCautelar) {
+        list.push({
+          severity: 'warning',
+          message: 'El vehículo registra medida cautelar en SUNARP - VERIFICAR SI ESTA CANCELADA',
+        });
+      }
+
       const keywords = ['PACIFICO', 'SEGUROS', 'REASEGUROS'];
       const hasInsuranceTx = sunarpData.some((record) => {
         const combined = `${record.naturalParticipants || ''} ${record.legalParticipants || ''}`.toUpperCase();

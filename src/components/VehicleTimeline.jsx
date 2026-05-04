@@ -6,12 +6,12 @@ import './VehicleTimeline.css';
 const INSURANCE_KEYWORDS = ['PACIFICO', 'SEGUROS', 'REASEGUROS', 'RIMAC', 'MAPFRE', 'POSITIVA', 'INTERSEGURO'];
 
 const EVENT_CONFIG = {
-  transfer:           { label: 'Compra / Venta',          color: '#3b82f6', critical: false },
-  insurance_transfer: { label: 'Transferencia a Seguro',  color: '#f97316', critical: true  },
+  transfer:           { label: 'Compra / Venta',           color: '#3b82f6', critical: false },
+  insurance_transfer: { label: 'Alerta SUNARP',            color: '#f97316', critical: true  },
   registration:       { label: 'Registro SUNARP',          color: '#6366f1', critical: false },
   accident:           { label: 'Accidente SBS',            color: '#ef4444', critical: true  },
-  soat:               { label: 'SOAT Vigente',             color: '#10b981', critical: false },
   soat_expired:       { label: 'SOAT Vencido',             color: '#dc2626', critical: true  },
+  soat:               { label: 'SOAT Vigente',             color: '#10b981', critical: false },
   inspection:         { label: 'Inspección Vigente',       color: '#8b5cf6', critical: false },
   inspection_expired: { label: 'Inspección Vencida',       color: '#dc2626', critical: true  },
 };
@@ -60,6 +60,9 @@ const normalizeEvents = (sunarpData, apesegSoatData, inspectionData, insuranceDa
       const isInsuranceTx =
         INSURANCE_KEYWORDS.some(k => participants.includes(k)) ||
         cat.includes('CAMBIO DE CARACTER') ||
+        cat.includes('CAMBIO DE PLACA') ||
+        actUp.includes('ADJUDICACION') ||
+        actUp.includes('MEDIDA CAUTELAR') ||
         actUp.includes('SEGURO');
       const isTransfer = cat.includes('TRANSFERENCIA') || cat.includes('INSCRIPCI');
       const type = isInsuranceTx ? 'insurance_transfer' : isTransfer ? 'transfer' : 'registration';
@@ -148,7 +151,7 @@ const normalizeEvents = (sunarpData, apesegSoatData, inspectionData, insuranceDa
   allSoats.slice(1).forEach(e => { e.critical = false; e.color = '#94a3b8'; });
 
   // Only the most recent expired inspection is critical — older ones become gray
-  const inspExpired = events.filter(e => e.type === 'inspection_expired').sort((a, b) => b.date - a.date);
+  const inspExpired = events.filter(e => e.type === 'inspection' || e.type === 'inspection_expired').sort((a, b) => b.date - a.date);
   inspExpired.slice(1).forEach(e => { e.critical = false; e.color = '#94a3b8'; });
 
   return events.sort((a, b) => a.date - b.date);
@@ -456,11 +459,22 @@ const VehicleTimeline = ({ sunarpData, apesegSoatData, inspectionData, insurance
       <div className="vtl-toolbar">
         <div className="vtl-legend">
           {Object.entries(EVENT_CONFIG).map(([type, cfg]) => (
-            <span key={type} className="vtl-legend__item">
-              <EventIcon type={type} size={14} />
-              <span style={{ color: cfg.color }}>{cfg.label}</span>
-            </span>
+            type.includes('inspection') || type.includes('inspection_expired') || type.includes('soat') || type.includes('soat_expired') ? '' :
+              <span key={type} className="vtl-legend__item">
+                <EventIcon type={type} size={14} />
+                <span style={{ color: cfg.color }}>{cfg.label}</span>
+              </span>
           ))}
+          <span key={'inspection_expired'} className="vtl-legend__item">
+            <EventIcon type={'inspection_expired'} size={14} />
+            <EventIcon type={'inspection'} size={14} />
+            <span style={{ color: EVENT_CONFIG['inspection'].color }}>{EVENT_CONFIG['inspection'].label}</span>
+          </span>
+          <span key={'soat_expired'} className="vtl-legend__item">
+            <EventIcon type={'soat_expired'} size={14} />
+            <EventIcon type={'soat'} size={14} />
+            <span style={{ color: EVENT_CONFIG['soat'].color }}>{EVENT_CONFIG['soat'].label}</span>
+          </span>
         </div>
         <div className="vtl-controls">
           <label className="vtl-filter-label">

@@ -1,5 +1,6 @@
 import { useState, useRef, useCallback, useEffect, useMemo } from 'react';
 import PropTypes from 'prop-types';
+import api from '../services/api';
 import './VehicleTimeline.css';
 
 // ── Config ─────────────────────────────────────────────────────────────────────
@@ -68,6 +69,10 @@ const normalizeEvents = (sunarpData, apesegSoatData, inspectionData, insuranceDa
       const type = isInsuranceTx ? 'insurance_transfer' : isTransfer ? 'transfer' : 'registration';
       events.push({
         id: `sunarp-${i}`, date, type,
+        source: 'sunarp',
+        tituloYear: r.tituloYear || null,
+        tituloNumber: r.tituloNumber || null,
+        tituloExtracted: r.tituloExtracted || false,
         title: isInsuranceTx ? 'Transferencia a compañía de seguros'
           : isTransfer ? 'Compra / Venta'
           : 'Registro SUNARP',
@@ -254,6 +259,71 @@ const EventIcon = ({ type, size = 22, color: colorOverride }) => {
         </svg>
       );
   }
+};
+
+// ── SUNARP PDF Button ───────────────────────────────────────────────────────────
+const SunarpPdfButton = ({ tituloYear, tituloNumber }) => {
+  const [status, setStatus] = useState('idle'); // 'idle' | 'loading' | 'error'
+  const ctrl = useRef({ attempts: 0, timer: null });
+
+  useEffect(() => () => clearTimeout(ctrl.current.timer), []);
+
+  const run = useCallback(async () => {
+    try {
+      const { data } = await api.get(`/sprl-sunarp-titles/${tituloYear}/${tituloNumber}`);
+      if (data.tituloExtracted && data.pdfBase64) {
+        const b64 = data.pdfBase64.includes(',') ? data.pdfBase64.split(',')[1] : data.pdfBase64;
+        const bytes = Uint8Array.from(atob(b64), c => c.charCodeAt(0));
+        const url = URL.createObjectURL(new Blob([bytes], { type: 'application/pdf' }));
+        window.open(url, '_blank');
+        setStatus('idle');
+        return;
+      }
+    } catch { /* fall through to retry */ }
+    if (++ctrl.current.attempts >= 8) {
+      setStatus('error');
+    } else {
+      ctrl.current.timer = setTimeout(run, 12000);
+    }
+  }, [tituloYear, tituloNumber]);
+
+  const handleClick = (e) => {
+    e.stopPropagation();
+    if (status !== 'idle') return;
+    ctrl.current = { attempts: 0, timer: null };
+    setStatus('loading');
+    run();
+  };
+
+  if (status === 'loading') {
+    return (
+      <span className="vtl-pdf-btn" title="Obteniendo PDF…">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" className="vtl-spin" aria-hidden="true">
+          <circle cx="12" cy="12" r="9" stroke="#cbd5e1" strokeWidth="2.2"/>
+          <path d="M12 3a9 9 0 0 1 9 9" stroke="#3b82f6" strokeWidth="2.2" strokeLinecap="round"/>
+        </svg>
+        <span>PDF</span>
+      </span>
+    );
+  }
+
+  const color = status === 'error' ? '#ef4444' : '#3b82f6';
+  return (
+    <button
+      className={`vtl-pdf-btn${status === 'error' ? ' vtl-pdf-btn--error' : ''}`}
+      onClick={handleClick}
+      disabled={status === 'error'}
+      title={status === 'error' ? 'No se pudo obtener el PDF (límite alcanzado)' : 'Ver título registral (PDF)'}
+    >
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" fill={color} opacity="0.15" stroke={color} strokeWidth="1.8"/>
+        <polyline points="14 2 14 8 20 8" stroke={color} strokeWidth="1.5"/>
+        <line x1="8" y1="13" x2="16" y2="13" stroke={color} strokeWidth="1.5" strokeLinecap="round"/>
+        <line x1="8" y1="16" x2="13" y2="16" stroke={color} strokeWidth="1.5" strokeLinecap="round"/>
+      </svg>
+      <span>PDF</span>
+    </button>
+  );
 };
 
 // ── Main Component ──────────────────────────────────────────────────────────────
@@ -604,6 +674,14 @@ const VehicleTimeline = ({ sunarpData, apesegSoatData, inspectionData, insurance
                   </div>
                 ))}
               </div>
+              {selectedEvent.source === 'sunarp' && selectedEvent.tituloExtracted && (
+                <div className="vtl-popup__footer">
+                  <SunarpPdfButton
+                    tituloYear={selectedEvent.tituloYear}
+                    tituloNumber={selectedEvent.tituloNumber}
+                  />
+                </div>
+              )}
             </div>
           );
         })()}

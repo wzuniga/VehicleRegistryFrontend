@@ -1,9 +1,11 @@
 import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
 import './LandingPage.css';
 import rav4Image from '../assets/rav4.png';
 
 function LandingPage() {
   const navigate = useNavigate();
+  const { isAuthenticated } = useAuth();
 
   const handleGetReport = () => {
     navigate('/search');
@@ -26,7 +28,13 @@ function LandingPage() {
           <div className="navbar-menu">
             <a href="#features" className="nav-link">Características</a>
             <a href="#benefits" className="nav-link">Beneficios</a>
-            <button className="nav-btn" onClick={handleGetReport}>Consultar ahora</button>
+            {isAuthenticated
+              ? <button className="nav-btn" onClick={() => navigate('/new-search')}>Ir a la app</button>
+              : <>
+                  <button className="nav-btn nav-btn--outline" onClick={() => navigate('/login')}>Iniciar sesión</button>
+                  <button className="nav-btn" onClick={() => navigate('/new-search')}>Consultar ahora</button>
+                </>
+            }
           </div>
         </div>
       </nav>

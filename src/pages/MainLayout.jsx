@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
 import SearchPlate from '../components/SearchPlate';
 import SearchHistory from '../components/SearchHistory';
 import './MainLayout.css';
@@ -7,6 +8,7 @@ import './MainLayout.css';
 const MainLayout = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
+  const { user, logout } = useAuth();
   const [isSidebarOpen, setIsSidebarOpen] = useState(() => {
     // En móvil (max-width: 768px), el sidebar inicia cerrado
     return window.innerWidth > 768;
@@ -52,6 +54,7 @@ const MainLayout = () => {
   };
 
   const handleLogout = () => {
+    logout();
     navigate('/');
   };
 
@@ -72,7 +75,10 @@ const MainLayout = () => {
                   <circle cx="12" cy="7" r="4"></circle>
                 </svg>
               </div>
-              <span className="user-name">Test User</span>
+              <span className="user-name">{user?.name || user?.email || 'Usuario'}</span>
+              {user?.credits !== undefined && (
+                <div style={{ fontSize: '0.7rem', color: '#60a5fa', fontWeight: 600 }}>{user.credits} créditos</div>
+              )}
             </div>
           </div>
         </div>

@@ -101,6 +101,18 @@
   box-shadow: 0 6px 20px rgba(96, 165, 250, 0.4);
 }
 
+.nav-btn--outline {
+  background: transparent;
+  border: 1.5px solid rgba(96,165,250,0.5);
+  color: #e2e8f0;
+  box-shadow: none;
+}
+.nav-btn--outline:hover {
+  background: rgba(96,165,250,0.1);
+  border-color: rgba(96,165,250,0.8);
+  box-shadow: none;
+}
+
 /* Main Search Section */
 .main-search-section {
   min-height: 100vh;

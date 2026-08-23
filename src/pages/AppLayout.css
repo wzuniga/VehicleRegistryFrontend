@@ -1,5 +1,9 @@
 /* =============================================
    APP LAYOUT — Navbar + Sidebar + Main
+   El navbar y el sidebar viven en src/components/
+   (Navbar.jsx/css, Sidebar.jsx/css) — clase única
+   compartida con el resto de la app (ej. AdminPage).
+   No dupliques esos estilos acá.
    ============================================= */
 
 .app-layout {
@@ -11,99 +15,6 @@
   font-family: 'Inter', system-ui, sans-serif;
 }
 
-/* ----- Navbar ----- */
-.app-navbar {
-  height: 70px;
-  background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
-  color: white;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  z-index: 1000;
-}
-
-.app-navbar__content {
-  display: flex;
-  align-items: center;
-  height: 100%;
-  padding: 0 1.5rem;
-  gap: 1rem;
-}
-
-.app-navbar__toggle {
-  background: rgba(96, 165, 250, 0.15);
-  border: 1px solid rgba(96, 165, 250, 0.3);
-  color: white;
-  cursor: pointer;
-  padding: 0.55rem 0.7rem;
-  border-radius: 10px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: all 0.25s ease;
-  flex-shrink: 0;
-}
-
-.app-navbar__toggle:hover {
-  background: rgba(96, 165, 250, 0.28);
-  border-color: rgba(96, 165, 250, 0.55);
-  transform: translateY(-1px);
-}
-
-.app-navbar__title {
-  font-size: 1.4rem;
-  font-weight: 700;
-  margin: 0;
-  flex: 1;
-  background: #3b82f6;
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-  letter-spacing: -0.02em;
-}
-
-.app-navbar__user {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  padding: 0.55rem 1.1rem;
-  border-radius: 12px;
-  /* background: rgba(96, 165, 250, 0.1);
-  border: 1px solid rgba(96, 165, 250, 0.2); */
-  transition: all 0.25s ease;
-  cursor: default;
-}
-
-.app-navbar__user:hover {
-  background: rgba(96, 165, 250, 0.18);
-  border-color: rgba(96, 165, 250, 0.38);
-}
-
-.app-navbar__avatar {
-  width: 36px;
-  height: 36px;
-  border-radius: 50%;
-  background: #3b82f6;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: white;
-  font-size: 0.78rem;
-  font-weight: 700;
-  letter-spacing: 0.5px;
-  box-shadow: 0 2px 10px rgba(59, 130, 246, 0.4);
-  flex-shrink: 0;
-}
-
-.app-navbar__username {
-  font-size: 0.95rem;
-  font-weight: 500;
-  color: white;
-  white-space: nowrap;
-}
-
 /* ----- Layout body ----- */
 .app-layout__body {
   display: flex;
@@ -112,11 +23,6 @@
   overflow: hidden;
   position: relative;
 }
-
-/* ----- Sidebar -----
-   Extraído a src/components/Sidebar.jsx + Sidebar.css (clase única
-   compartida con el resto de la app, ej. AdminPage). No dupliques
-   estilos de sidebar acá. */
 
 /* ----- Main content ----- */
 .app-main {
@@ -130,32 +36,6 @@
    RESPONSIVE — Mobile (≤768px)
    ============================================= */
 @media (max-width: 768px) {
-  .app-navbar {
-    height: 56px;
-  }
-
-  .app-navbar__content {
-    padding: 0 0.9rem;
-  }
-
-  .app-navbar__title {
-    font-size: 1.1rem;
-  }
-
-  .app-navbar__toggle {
-    padding: 0.4rem 0.55rem;
-  }
-
-  .app-navbar__avatar {
-    width: 32px;
-    height: 32px;
-    font-size: 0.7rem;
-  }
-
-  .app-navbar__username {
-    display: none;
-  }
-
   .app-layout__body {
     margin-top: 56px;
     height: calc(100vh - 56px);

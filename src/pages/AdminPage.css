@@ -1,107 +1,19 @@
+/* El navbar y el sidebar viven en src/components/ (Navbar.jsx/css,
+   Sidebar.jsx/css) — clase única compartida con el resto de la app
+   (AppLayout). No dupliques esos estilos acá. */
 .admin-layout {
   height: 100vh;
   overflow: hidden;
-  display: flex;
-  flex-direction: column;
-  background: #f8fafc;
   font-family: 'Inter', system-ui, sans-serif;
 }
 
-/* Navbar */
-.admin-navbar {
-  background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
-  height: 56px;
-  flex-shrink: 0;
-  display: flex;
-  align-items: center;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.18);
-}
-
-.admin-navbar__content {
-  width: 100%;
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 0 1.5rem;
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-  justify-content: space-between;
-}
-
-.admin-navbar__toggle {
-  background: rgba(96, 165, 250, 0.15);
-  border: 1px solid rgba(96, 165, 250, 0.3);
-  color: white;
-  cursor: pointer;
-  padding: 0.4rem 0.55rem;
-  border-radius: 8px;
-  display: none;
-  align-items: center;
-  justify-content: center;
-  transition: all 0.2s ease;
-  flex-shrink: 0;
-}
-.admin-navbar__toggle:hover {
-  background: rgba(96, 165, 250, 0.28);
-  border-color: rgba(96, 165, 250, 0.55);
-}
-
-.admin-navbar__logo {
-  font-size: 1.15rem;
-  font-weight: 800;
-  background: linear-gradient(90deg, #60a5fa, #a78bfa);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-  text-decoration: none;
-}
-
-.admin-navbar__right {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-}
-
-.admin-navbar__user {
-  display: flex;
-  align-items: center;
-  gap: 0.4rem;
-  font-size: 0.85rem;
-  color: #e2e8f0;
-  font-weight: 500;
-}
-
-.admin-navbar__role {
-  background: rgba(96,165,250,0.2);
-  color: #60a5fa;
-  font-size: 0.7rem;
-  font-weight: 700;
-  padding: 0.15rem 0.5rem;
-  border-radius: 99px;
-  border: 1px solid rgba(96,165,250,0.3);
-}
-
-.admin-navbar__logout {
-  background: none;
-  border: 1px solid rgba(148,163,184,0.3);
-  color: #94a3b8;
-  font-size: 0.8rem;
-  font-weight: 500;
-  padding: 0.35rem 0.75rem;
-  border-radius: 6px;
-  cursor: pointer;
-  transition: all 0.15s;
-  font-family: inherit;
-}
-.admin-navbar__logout:hover { color: #e2e8f0; border-color: rgba(148,163,184,0.6); }
-
-/* Layout — el sidebar es el componente compartido src/components/Sidebar.jsx
-   (clase .sidebar), no hay estilos de sidebar propios acá. */
 .admin-container {
-  flex: 1;
   display: flex;
+  margin-top: 70px;
+  height: calc(100vh - 70px);
   overflow: hidden;
   width: 100%;
+  background: #f8fafc;
 }
 
 /* Main */
@@ -398,8 +310,10 @@
 
 /* Responsive */
 @media (max-width: 768px) {
-  .admin-navbar__toggle { display: flex; }
-  .admin-navbar__logo { flex: 1; }
+  .admin-container {
+    margin-top: 56px;
+    height: calc(100vh - 56px);
+  }
   .admin-main { padding: 1rem; }
   .admin-grant-form__fields { flex-direction: column; }
 }

@@ -1,8 +1,9 @@
 import { useState, useEffect } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import api from '../services/api';
 import { useAuth } from '../context/AuthContext';
 import Sidebar from '../components/Sidebar';
+import Navbar from '../components/Navbar';
 import './AdminPage.css';
 
 const SearchIcon = () => (
@@ -27,6 +28,9 @@ const DetectionsIcon = () => (
   <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
     <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/>
   </svg>
+);
+const LogoutIcon = () => (
+  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" /><polyline points="16 17 21 12 16 7" /><line x1="21" y1="12" x2="9" y2="12" /></svg>
 );
 
 const SuccessModal = ({ onClose }) => (
@@ -239,38 +243,23 @@ const AdminPage = () => {
     { key: 'detections', label: 'Detecciones de Placas', icon: <DetectionsIcon />, onClick: () => setSection('detections'), active: section === 'detections' },
   ];
 
+  const sidebarFooterItems = [
+    { key: 'logout', label: 'Cerrar sesión', icon: <LogoutIcon />, onClick: handleLogout },
+  ];
+
   return (
     <div className="admin-layout">
       {showModal && <SuccessModal onClose={() => setShowModal(false)} />}
       {expandedImage && <ImageLightbox base64={expandedImage} onClose={() => setExpandedImage(null)} />}
 
-      {/* Navbar */}
-      <nav className="admin-navbar">
-        <div className="admin-navbar__content">
-          <button className="admin-navbar__toggle" onClick={() => setIsSidebarOpen(v => !v)} aria-label="Toggle menu">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-              <line x1="3" y1="6" x2="21" y2="6" /><line x1="3" y1="12" x2="21" y2="12" /><line x1="3" y1="18" x2="21" y2="18" />
-            </svg>
-          </button>
-          <Link to="/new-search" className="admin-navbar__logo">Auto Check</Link>
-          <div className="admin-navbar__right">
-            <span className="admin-navbar__user">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
-                <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>
-              </svg>
-              {user?.name || user?.email}
-              <span className="admin-navbar__role">Admin</span>
-            </span>
-            <button className="admin-navbar__logout" onClick={handleLogout}>Cerrar sesión</button>
-          </div>
-        </div>
-      </nav>
+      <Navbar onToggleSidebar={() => setIsSidebarOpen((v) => !v)} user={user} />
 
       <div className="admin-container">
         <Sidebar
           isOpen={isSidebarOpen}
           onClose={() => setIsSidebarOpen(false)}
           items={sidebarItems}
+          footerItems={sidebarFooterItems}
         />
 
         {/* Main */}

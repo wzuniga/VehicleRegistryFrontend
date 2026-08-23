@@ -1,4 +1,5 @@
-import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
+import Navbar from '../components/Navbar';
 import './ManualFilter.css';
 import sunarpImg from '../assets/manualFilter/sunarp-removebg-preview.png';
 import sprlSunarpImg from '../assets/manualFilter/sprl-sunarp-removebg-preview.png';
@@ -14,7 +15,7 @@ import appCambioPlacaLogo from '../assets/manualFilter/logo_app_export.png';
 import sigueloPlusLogo from '../assets/manualFilter/siguelo_plus.png';
 
 function ManualFilter() {
-  const navigate = useNavigate();
+  const { user } = useAuth();
 
   // Servicios principales de consulta
   const mainServices = [
@@ -212,17 +213,7 @@ function ManualFilter() {
 
   return (
     <div className="manual-filter">
-      {/* Navbar */}
-      <nav className="manual-navbar">
-        <div className="navbar-container">
-          <div className="navbar-logo">
-            <span className="logo-text">CONSULTA VEHICULAR</span>
-          </div>
-          <div className="navbar-menu">
-            <button className="nav-btn" onClick={() => navigate('/')}>Volver al inicio</button>
-          </div>
-        </div>
-      </nav>
+      <Navbar titleTo="/new-search" user={user} />
 
       {/* Hero Section */}
       <section className="hero-section">

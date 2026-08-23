@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { Outlet, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import Sidebar from '../components/Sidebar';
+import Navbar from '../components/Navbar';
 import './AppLayout.css';
 
 const SearchIcon = () => (
@@ -39,10 +40,6 @@ const AppLayout = () => {
 
   const handleLogout = () => { logout(); navigate('/'); };
 
-  const initials = user?.name
-    ? user.name.split(' ').slice(0, 2).map(w => w[0]).join('').toUpperCase()
-    : (user?.email?.[0] ?? 'U').toUpperCase();
-
   const sidebarItems = [
     { key: 'search', label: 'Busqueda', icon: <SearchIcon />, to: '/new-search' },
     { key: 'historial', label: 'Historial', icon: <HistoryIcon />, to: '/historial' },
@@ -59,26 +56,7 @@ const AppLayout = () => {
 
   return (
     <div className="app-layout">
-      {/* Navbar Superior */}
-      <nav className="app-navbar">
-        <div className="app-navbar__content">
-          <button className="app-navbar__toggle" onClick={() => setIsSidebarOpen(v => !v)} aria-label="Toggle menu">
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-              <line x1="3" y1="6" x2="21" y2="6" /><line x1="3" y1="12" x2="21" y2="12" /><line x1="3" y1="18" x2="21" y2="18" />
-            </svg>
-          </button>
-          <h1 className="app-navbar__title">Auto Check</h1>
-          <div className="app-navbar__user">
-            <div className="app-navbar__avatar" aria-hidden="true">{initials}</div>
-            <div style={{ display: 'flex', flexDirection: 'column', lineHeight: 1.2 }}>
-              <span className="app-navbar__username">{user?.name || user?.email}</span>
-              <span style={{ fontSize: '0.7rem', color: '#60a5fa', fontWeight: 600 }}>
-                {user?.credits ?? 0} créditos
-              </span>
-            </div>
-          </div>
-        </div>
-      </nav>
+      <Navbar onToggleSidebar={() => setIsSidebarOpen((v) => !v)} user={user} />
 
       <div className="app-layout__body">
         <Sidebar

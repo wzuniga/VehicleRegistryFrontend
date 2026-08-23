@@ -3,6 +3,7 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import SearchPlate from '../components/SearchPlate';
 import SearchHistory from '../components/SearchHistory';
+import Navbar from '../components/Navbar';
 import './MainLayout.css';
 
 const MainLayout = () => {
@@ -60,29 +61,7 @@ const MainLayout = () => {
 
   return (
     <div className="main-layout">
-      {/* Navbar Superior */}
-      <nav className="top-navbar">
-        <div className="navbar-content">
-          <button className="menu-toggle" onClick={toggleSidebar}>
-            ☰
-          </button>
-          <h1 className="navbar-title">Auto Check</h1>
-          <div className="navbar-actions">
-            <div className="user-profile">
-              <div className="avatar">
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                  <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"></path>
-                  <circle cx="12" cy="7" r="4"></circle>
-                </svg>
-              </div>
-              <span className="user-name">{user?.name || user?.email || 'Usuario'}</span>
-              {user?.credits !== undefined && (
-                <div style={{ fontSize: '0.7rem', color: '#60a5fa', fontWeight: 600 }}>{user.credits} créditos</div>
-              )}
-            </div>
-          </div>
-        </div>
-      </nav>
+      <Navbar onToggleSidebar={toggleSidebar} user={user} />
 
       <div className="layout-container">
         {/* Menú Lateral Izquierdo */}

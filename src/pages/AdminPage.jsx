@@ -21,7 +21,7 @@ const SuccessModal = ({ onClose }) => (
   </div>
 );
 
-const DETECTIONS_PAGE_SIZE = 10;
+const DETECTIONS_PAGE_SIZE = 12;
 
 const formatImageSize = (base64) => {
   if (!base64) return '—';
@@ -30,7 +30,7 @@ const formatImageSize = (base64) => {
   return kb >= 1024 ? `${(kb / 1024).toFixed(2)} MB` : `${Math.round(kb)} KB`;
 };
 
-const DetectionImage = ({ base64, onDimensions }) => {
+const DetectionImage = ({ base64, onDimensions, onClick }) => {
   const src = `data:image/jpeg;base64,${base64}`;
   return (
     <img
@@ -39,11 +39,24 @@ const DetectionImage = ({ base64, onDimensions }) => {
       className="admin-detection-card__image"
       onLoad={(e) => onDimensions?.(e.target.naturalWidth, e.target.naturalHeight)}
       onError={(e) => { e.target.style.display = 'none'; }}
+      onClick={onClick}
     />
   );
 };
 
-const DetectionCard = ({ detection, onSave }) => {
+const ImageLightbox = ({ base64, onClose }) => (
+  <div className="admin-lightbox-overlay" onClick={onClose}>
+    <img
+      src={`data:image/jpeg;base64,${base64}`}
+      alt="Placa detectada (ampliada)"
+      className="admin-lightbox-image"
+      onClick={(e) => e.stopPropagation()}
+    />
+    <button className="admin-lightbox-close" onClick={onClose} aria-label="Cerrar">✕</button>
+  </div>
+);
+
+const DetectionCard = ({ detection, onSave, onExpandImage }) => {
   const [plate, setPlate] = useState(detection.possiblePlate || '');
   const [dims, setDims] = useState(null);
   const [saving, setSaving] = useState(false);
@@ -69,7 +82,11 @@ const DetectionCard = ({ detection, onSave }) => {
 
   return (
     <div className="admin-detection-card">
-      <DetectionImage base64={detection.imageBase64} onDimensions={(w, h) => setDims(`${w}×${h}px`)} />
+      <DetectionImage
+        base64={detection.imageBase64}
+        onDimensions={(w, h) => setDims(`${w}×${h}px`)}
+        onClick={() => onExpandImage(detection.imageBase64)}
+      />
 
       <div className="admin-detection-card__body">
         <div className="admin-detection-card__row">
@@ -126,6 +143,7 @@ const AdminPage = () => {
   const [detectionsTotalPages, setDetectionsTotalPages] = useState(1);
   const [detectionsTotal, setDetectionsTotal] = useState(0);
   const [loadingDetections, setLoadingDetections] = useState(false);
+  const [expandedImage, setExpandedImage] = useState(null);
 
   useEffect(() => {
     if (section !== 'users') return;
@@ -180,6 +198,7 @@ const AdminPage = () => {
   return (
     <div className="admin-layout">
       {showModal && <SuccessModal onClose={() => setShowModal(false)} />}
+      {expandedImage && <ImageLightbox base64={expandedImage} onClose={() => setExpandedImage(null)} />}
 
       {/* Navbar */}
       <nav className="admin-navbar">
@@ -331,7 +350,12 @@ const AdminPage = () => {
                 <>
                   <div className="admin-detections-grid">
                     {detections.map((d) => (
-                      <DetectionCard key={d.id} detection={d} onSave={handleSaveDetectionPlate} />
+                      <DetectionCard
+                        key={d.id}
+                        detection={d}
+                        onSave={handleSaveDetectionPlate}
+                        onExpandImage={setExpandedImage}
+                      />
                     ))}
                     {detections.length === 0 && (
                       <p className="admin-loading">Sin detecciones todavía.</p>

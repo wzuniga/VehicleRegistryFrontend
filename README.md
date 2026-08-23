@@ -80,6 +80,14 @@ Al ser una ruta relativa, el build funciona igual sea cual sea el dominio/IP con
 
 ### Actualizar en producción
 
+**Automático:** cada `push` a `main` dispara `.github/workflows/deploy.yml`, que se conecta por SSH al servidor y hace `git reset --hard origin/main` + `npm install` + `npm run build`. Nginx sirve el `dist/` nuevo automáticamente, sin reiniciar nada.
+
+Requiere estos secrets en GitHub (Settings → Secrets and variables → Actions) para este repo:
+- `DEPLOY_HOST` = `137.184.208.111`
+- `DEPLOY_USER` = `root`
+- `DEPLOY_SSH_KEY` = llave privada dedicada para CI
+
+**Manual (si hace falta hacerlo a mano):**
 ```bash
 cd /opt/VehicleRegistryFrontend
 git pull origin main

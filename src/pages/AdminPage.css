@@ -266,6 +266,7 @@
   object-fit: cover;
   background: #f1f5f9;
   display: block;
+  cursor: zoom-in;
 }
 
 .admin-detection-card__body {
@@ -323,6 +324,43 @@
   color: #475569;
   font-weight: 600;
 }
+
+/* Image lightbox */
+.admin-lightbox-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.85);
+  z-index: 1100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+  cursor: zoom-out;
+}
+
+.admin-lightbox-image {
+  max-width: 100%;
+  max-height: 100%;
+  border-radius: 8px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+  cursor: default;
+}
+
+.admin-lightbox-close {
+  position: fixed;
+  top: 1.25rem;
+  right: 1.5rem;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: none;
+  background: rgba(255,255,255,0.12);
+  color: white;
+  font-size: 1.1rem;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.admin-lightbox-close:hover { background: rgba(255,255,255,0.24); }
 
 /* Alert */
 .admin-alert {

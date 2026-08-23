@@ -2,7 +2,32 @@ import { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import api from '../services/api';
 import { useAuth } from '../context/AuthContext';
+import Sidebar from '../components/Sidebar';
 import './AdminPage.css';
+
+const SearchIcon = () => (
+  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="11" cy="11" r="8" /><path d="m21 21-4.35-4.35" /></svg>
+);
+const HistoryIcon = () => (
+  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10" /><polyline points="12 6 12 12 16 14" /></svg>
+);
+const CreditsIcon = () => (
+  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+    <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="8.5" cy="7" r="4"/>
+    <line x1="20" y1="8" x2="20" y2="14"/><line x1="23" y1="11" x2="17" y2="11"/>
+  </svg>
+);
+const UsersIcon = () => (
+  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+    <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/>
+    <path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+  </svg>
+);
+const DetectionsIcon = () => (
+  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+    <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/>
+  </svg>
+);
 
 const SuccessModal = ({ onClose }) => (
   <div className="admin-modal-overlay" onClick={onClose}>
@@ -145,6 +170,17 @@ const AdminPage = () => {
   const [loadingDetections, setLoadingDetections] = useState(false);
   const [expandedImage, setExpandedImage] = useState(null);
 
+  const [isSidebarOpen, setIsSidebarOpen] = useState(() => window.innerWidth > 768);
+
+  useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth > 768) setIsSidebarOpen(true);
+      else setIsSidebarOpen(false);
+    };
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
   useEffect(() => {
     if (section !== 'users') return;
     setLoadingUsers(true);
@@ -195,6 +231,14 @@ const AdminPage = () => {
 
   const formatDate = (d) => new Date(d).toLocaleDateString('es-PE', { day: '2-digit', month: 'short', year: 'numeric' });
 
+  const sidebarItems = [
+    { key: 'search', label: 'Buscar Placa', icon: <SearchIcon />, to: '/new-search' },
+    { key: 'historial', label: 'Historial', icon: <HistoryIcon />, to: '/historial' },
+    { key: 'preregister', label: 'Otorgar Créditos', icon: <CreditsIcon />, onClick: () => setSection('preregister'), active: section === 'preregister' },
+    { key: 'users', label: 'Usuarios registrados', icon: <UsersIcon />, onClick: () => setSection('users'), active: section === 'users' },
+    { key: 'detections', label: 'Detecciones de Placas', icon: <DetectionsIcon />, onClick: () => setSection('detections'), active: section === 'detections' },
+  ];
+
   return (
     <div className="admin-layout">
       {showModal && <SuccessModal onClose={() => setShowModal(false)} />}
@@ -203,6 +247,11 @@ const AdminPage = () => {
       {/* Navbar */}
       <nav className="admin-navbar">
         <div className="admin-navbar__content">
+          <button className="admin-navbar__toggle" onClick={() => setIsSidebarOpen(v => !v)} aria-label="Toggle menu">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+              <line x1="3" y1="6" x2="21" y2="6" /><line x1="3" y1="12" x2="21" y2="12" /><line x1="3" y1="18" x2="21" y2="18" />
+            </svg>
+          </button>
           <Link to="/new-search" className="admin-navbar__logo">Auto Check</Link>
           <div className="admin-navbar__right">
             <span className="admin-navbar__user">
@@ -218,53 +267,11 @@ const AdminPage = () => {
       </nav>
 
       <div className="admin-container">
-        {/* Sidebar */}
-        <aside className="admin-sidebar">
-          <nav className="admin-sidebar__nav">
-            <Link to="/new-search" className="admin-sidebar__link">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
-                <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
-              </svg>
-              Buscar Placa
-            </Link>
-            <Link to="/historial" className="admin-sidebar__link">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
-                <path d="M9 5H2v7h7V5Z"/><path d="M9 14H2v7h7v-7Z"/><path d="M22 5h-7v7h7V5Z"/><path d="M22 14h-7v7h7v-7Z"/>
-              </svg>
-              Historial
-            </Link>
-            <div className="admin-sidebar__divider" />
-            <button
-              className={`admin-sidebar__link admin-sidebar__link--btn ${section === 'preregister' ? 'active' : ''}`}
-              onClick={() => setSection('preregister')}
-            >
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
-                <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="8.5" cy="7" r="4"/>
-                <line x1="20" y1="8" x2="20" y2="14"/><line x1="23" y1="11" x2="17" y2="11"/>
-              </svg>
-              Otorgar Créditos
-            </button>
-            <button
-              className={`admin-sidebar__link admin-sidebar__link--btn ${section === 'users' ? 'active' : ''}`}
-              onClick={() => setSection('users')}
-            >
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
-                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/>
-                <path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>
-              </svg>
-              Usuarios registrados
-            </button>
-            <button
-              className={`admin-sidebar__link admin-sidebar__link--btn ${section === 'detections' ? 'active' : ''}`}
-              onClick={() => setSection('detections')}
-            >
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
-                <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/>
-              </svg>
-              Detecciones de Placas
-            </button>
-          </nav>
-        </aside>
+        <Sidebar
+          isOpen={isSidebarOpen}
+          onClose={() => setIsSidebarOpen(false)}
+          items={sidebarItems}
+        />
 
         {/* Main */}
         <main className="admin-main">

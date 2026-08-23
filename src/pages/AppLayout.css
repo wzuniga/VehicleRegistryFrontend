@@ -113,118 +113,10 @@
   position: relative;
 }
 
-/* ----- Mobile overlay ----- */
-.app-sidebar__overlay {
-  display: none;
-}
-
-/* ----- Sidebar ----- */
-.app-sidebar {
-  width: 250px;
-  background: linear-gradient(180deg, #f8fafc 0%, #e2e8f0 100%);
-  border-right: 1px solid rgba(59, 130, 246, 0.1);
-  transition: width 0.3s ease;
-  overflow-y: auto;
-  overflow-x: hidden;
-  flex-shrink: 0;
-  box-shadow: 2px 0 10px rgba(0, 0, 0, 0.05);
-}
-
-.app-sidebar--closed {
-  width: 0;
-  border-right: none;
-}
-
-.app-sidebar__inner {
-  display: flex;
-  flex-direction: column;
-  height: 100%;
-  width: 250px;
-}
-
-.app-sidebar__nav {
-  flex: 1;
-  padding: 1.25rem 0;
-}
-
-.app-sidebar__footer {
-  border-top: 1px solid #e2e8f0;
-  padding: 0.75rem 0;
-  margin-top: auto;
-}
-
-.app-sidebar__menu {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-}
-
-.app-sidebar__menu li {
-  margin-bottom: 0.15rem;
-}
-
-.app-sidebar__link {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  padding: 0.85rem 1.5rem;
-  color: #475569;
-  text-decoration: none;
-  font-size: 0.95rem;
-  font-weight: 500;
-  border-radius: 0;
-  position: relative;
-  transition: background 0.2s ease, color 0.2s ease;
-  width: 100%;
-  white-space: nowrap;
-}
-
-.app-sidebar__link--btn {
-  background: none;
-  border: none;
-  cursor: pointer;
-  text-align: left;
-  font-family: inherit;
-}
-
-.app-sidebar__link::before {
-  content: '';
-  position: absolute;
-  left: 0;
-  top: 0;
-  bottom: 0;
-  width: 0;
-  background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
-  transition: width 0.25s ease;
-}
-
-.app-sidebar__icon {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 24px;
-  flex-shrink: 0;
-  z-index: 1;
-}
-
-.app-sidebar__link:hover {
-  background: rgba(59, 130, 246, 0.08);
-  color: #1e293b;
-}
-
-.app-sidebar__link:hover::before {
-  width: 4px;
-}
-
-.app-sidebar__link--active {
-  background-color: #1e293b !important;
-  color: white !important;
-}
-
-.app-sidebar__link--active::before {
-  width: 4px !important;
-  background: white !important;
-}
+/* ----- Sidebar -----
+   Extraído a src/components/Sidebar.jsx + Sidebar.css (clase única
+   compartida con el resto de la app, ej. AdminPage). No dupliques
+   estilos de sidebar acá. */
 
 /* ----- Main content ----- */
 .app-main {
@@ -267,36 +159,6 @@
   .app-layout__body {
     margin-top: 56px;
     height: calc(100vh - 56px);
-  }
-
-  /* Mobile overlay */
-  .app-sidebar__overlay {
-    display: block;
-    position: fixed;
-    inset: 0;
-    background: rgba(0, 0, 0, 0.4);
-    z-index: 998;
-    top: 56px;
-  }
-
-  .app-sidebar {
-    position: fixed;
-    left: 0;
-    top: 56px;
-    height: calc(100vh - 56px);
-    z-index: 999;
-    box-shadow: 4px 0 20px rgba(0, 0, 0, 0.18);
-    transition: transform 0.3s ease;
-    width: 250px;
-  }
-
-  .app-sidebar--open {
-    transform: translateX(0);
-  }
-
-  .app-sidebar--closed {
-    width: 250px;
-    transform: translateX(-100%);
   }
 
   .app-main {

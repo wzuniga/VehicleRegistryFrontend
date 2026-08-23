@@ -17,7 +17,4 @@ npm install
 echo "🔨 Construyendo proyecto..."
 npm run build
 
-echo "🔁 Reiniciando servicio con PM2..."
-pm2 restart vehicle-registry-frontend
-
-echo "✅ Despliegue completado con éxito."
+echo "✅ Despliegue completado con éxito. Nginx sirve dist/ directo, no hace falta reiniciar nada."

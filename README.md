@@ -59,6 +59,40 @@ Crear un archivo `.env` en la raíz del proyecto:
 VITE_API_BASE_URL=http://localhost:3000
 ```
 
+## 🚀 Despliegue a Producción
+
+**Arquitectura actual (en vivo):** este build estático se sirve directamente desde Nginx en el mismo VPS que el backend (`137.184.208.111`) — no corre bajo Node/PM2 en producción, Nginx lee los archivos de `dist/` directo del disco. El backend vive en el mismo servidor, expuesto solo bajo `/api/*` (mismo origen, sin CORS). Ver el detalle completo (diagrama, config de Nginx) en el `README.md` de `VehicleRegistryBackend`.
+
+```
+Internet ──80──▶ Nginx (137.184.208.111)
+                    ├── /      → este dist/ (estático)
+                    └── /api/* → proxy a VehicleRegistryBackend (PM2, 127.0.0.1:3000)
+```
+
+### Variables de entorno de producción
+
+`.env.production` (en este repo, ya versionado — no lleva secretos):
+```env
+VITE_API_BASE_URL=/api
+```
+
+Al ser una ruta relativa, el build funciona igual sea cual sea el dominio/IP con el que se acceda — todas las llamadas de `axios` van al mismo origen bajo `/api`, sin necesidad de configurar CORS en el backend.
+
+### Actualizar en producción
+
+```bash
+cd /opt/VehicleRegistryFrontend
+git pull origin main
+npm install
+npm run build   # regenera dist/, Nginx lo sirve automáticamente (no hace falta reiniciar nada)
+```
+
+El script `deploy.sh` hace exactamente esto. Como Nginx sirve `dist/` directo del disco, **no se necesita PM2 ni `serve` para el frontend en este despliegue** — `ecosystem.config.cjs` queda solo como alternativa por si en algún momento se sirve el frontend sin Nginx delante.
+
+### Primera vez en un servidor nuevo
+
+Ver la sección "Despliegue a Producción" del `README.md` de `VehicleRegistryBackend` para la instalación de Node/Nginx/PM2 y la config completa de Nginx (frontend + proxy `/api`).
+
 ## 📱 Rutas
 
 - `/addcarplate` - Página para agregar nuevas placas

@@ -1,226 +1,101 @@
-# Guía de Despliegue en Producción con PM2
+# Guía de Despliegue en Producción
 
-## 📋 Requisitos Previos
-- Node.js instalado
-- PM2 instalado globalmente
-- Servidor web (Nginx recomendado)
+## Enfoque actual (en uso): Nginx sirviendo el build estático directo
 
-## 🚀 Pasos para Despliegue
+**Este es el método realmente desplegado**, en el mismo VPS que el backend (`137.184.208.111`, ver `DEPLOYMENT.md`/`README.md` de `VehicleRegistryBackend`). Nginx lee los archivos de `dist/` directo del disco — no hace falta un proceso Node ni PM2 corriendo para el frontend.
 
-### 1. Instalar PM2 globalmente
+### 1. Construir la aplicación para producción
 ```bash
-npm install -g pm2
-```
-
-### 2. Construir la aplicación para producción
-```bash
+npm install
 npm run build
 ```
-Esto generará la carpeta `dist/` con los archivos optimizados.
+Esto genera `dist/` usando `.env.production` (`VITE_API_BASE_URL=/api`, ruta relativa al mismo origen — sin CORS).
 
-### 3. Instalar servidor HTTP estático
-```bash
-npm install -g serve
-# O también puedes usar:
-npm install --save-dev serve
-```
+### 2. Nginx sirve `dist/` y proxya `/api`
 
-### 4. Crear archivo de configuración PM2
-
-Crea `ecosystem.config.cjs` en la raíz del proyecto:
-
-```javascript
-module.exports = {
-  apps: [{
-    name: 'vehicle-registry-frontend',
-    script: 'serve',
-    args: 'dist -s -l 5173',
-    instances: 1,
-    autorestart: true,
-    watch: false,
-    max_memory_restart: '1G',
-    env: {
-      NODE_ENV: 'production',
-      PORT: 5173
-    }
-  }]
-};
-```
-
-### 5. Iniciar con PM2
-```bash
-# Iniciar la aplicación
-pm2 start ecosystem.config.cjs
-
-# Ver estado
-pm2 status
-
-# Ver logs
-pm2 logs vehicle-registry-frontend
-
-# Monitoreo
-pm2 monit
-```
-
-### 6. Configurar PM2 para iniciar automáticamente
-```bash
-# Guardar la configuración actual
-pm2 save
-
-# Generar script de inicio automático
-pm2 startup
-
-# Ejecutar el comando que te muestra PM2 (específico para tu sistema)
-```
-
-## 🔄 Comandos Útiles de PM2
-
-```bash
-# Detener la aplicación
-pm2 stop vehicle-registry-frontend
-
-# Reiniciar la aplicación
-pm2 restart vehicle-registry-frontend
-
-# Recargar sin downtime
-pm2 reload vehicle-registry-frontend
-
-# Eliminar de PM2
-pm2 delete vehicle-registry-frontend
-
-# Ver logs en tiempo real
-pm2 logs vehicle-registry-frontend --lines 100
-
-# Limpiar logs
-pm2 flush
-
-# Información detallada
-pm2 show vehicle-registry-frontend
-```
-
-## 🌐 Configuración de Nginx (Recomendado)
-
-Crea `/etc/nginx/sites-available/vehicle-registry`:
+Un solo `server` block en Nginx cubre frontend + backend (ver el detalle completo, con el `location /api/`, en el README de `VehicleRegistryBackend`):
 
 ```nginx
 server {
     listen 80;
-    server_name tu-dominio.com;
+    server_name tu-dominio.com;   # o tu IP
+
+    root /opt/VehicleRegistryFrontend/dist;
+    index index.html;
 
     location / {
-        proxy_pass http://localhost:5173;
+        try_files $uri $uri/ /index.html;   # necesario por React Router (SPA)
+    }
+
+    location /api/ {
+        proxy_pass http://127.0.0.1:3000/;
         proxy_http_version 1.1;
-        proxy_set_header Upgrade $http_upgrade;
-        proxy_set_header Connection 'upgrade';
         proxy_set_header Host $host;
-        proxy_cache_bypass $http_upgrade;
         proxy_set_header X-Real-IP $remote_addr;
         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
     }
 }
 ```
 
-Activar configuración:
 ```bash
 sudo ln -s /etc/nginx/sites-available/vehicle-registry /etc/nginx/sites-enabled/
 sudo nginx -t
 sudo systemctl restart nginx
 ```
 
-## 🔐 Configuración con HTTPS (SSL)
+### 3. Actualizar en producción
 
-Usando Certbot:
+```bash
+cd /opt/VehicleRegistryFrontend
+./deploy.sh   # git pull + npm install + npm run build. Nginx recoge el nuevo dist/ solo, sin reiniciar nada.
+```
+
+### 4. HTTPS (cuando haya un dominio)
+
 ```bash
 sudo apt install certbot python3-certbot-nginx
 sudo certbot --nginx -d tu-dominio.com
 ```
 
-## 📊 Monitoreo y Dashboard Web
+No hace falta cambiar `VITE_API_BASE_URL` al pasar a HTTPS: al ser una ruta relativa (`/api`), sigue apuntando al mismo origen.
+
+---
+
+## Alternativa: PM2 + `serve` (solo si no se usa Nginx delante)
+
+Si en algún escenario se necesita correr el frontend como su propio proceso (por ejemplo detrás de un load balancer que no puede servir archivos estáticos), `ecosystem.config.cjs` ya trae esta opción lista:
 
 ```bash
-# Instalar PM2 Web Dashboard
-pm2 install pm2-server-monit
-
-# O usar interfaz web
-pm2 web
-# Abre http://localhost:9615
-```
-
-## 🔄 Script de Actualización
-
-Crea `deploy.sh`:
-
-```bash
-#!/bin/bash
-echo "🚀 Iniciando despliegue..."
-
-# Pull cambios
-git pull origin main
-
-# Instalar dependencias
-npm install
-
-# Construir
+npm install -g pm2 serve
 npm run build
-
-# Reiniciar PM2
-pm2 reload ecosystem.config.cjs
-
-echo "✅ Despliegue completado"
+pm2 start ecosystem.config.cjs   # sirve dist/ con `serve` en el puerto 5173
+pm2 save
+pm2 startup
 ```
 
-Dar permisos:
-```bash
-chmod +x deploy.sh
-```
+Comandos útiles: `pm2 status`, `pm2 logs vehicle-registry-frontend`, `pm2 restart vehicle-registry-frontend`, `pm2 monit`.
 
-## 📝 Variables de Entorno en Producción
-
-Crea `.env.production`:
-```env
-VITE_API_BASE_URL=https://api.tu-dominio.com
-```
-
-Y modifica el build:
-```bash
-npm run build -- --mode production
-```
+Si se usa este modo, Nginx pasaría a hacer proxy hacia `http://127.0.0.1:5173` en vez de servir `dist/` directo — pero **esto no es lo desplegado actualmente**.
 
 ## ⚠️ Troubleshooting
 
-### Si PM2 no encuentra 'serve':
+### Si el build se queda "Killed" (sin terminar, sin error claro)
+Es OOM (memoria insuficiente) — típico en droplets pequeños (≤1GB RAM) corriendo `vite build`. Solución: habilitar swap en el servidor.
 ```bash
-# Opción 1: Usar npx
-pm2 start "npx serve dist -s -l 5173" --name vehicle-registry-frontend
-
-# Opción 2: Ruta completa
-which serve  # Obtener ruta
-pm2 start /ruta/completa/serve -- dist -s -l 5173 --name vehicle-registry-frontend
+fallocate -l 2G /swapfile && chmod 600 /swapfile && mkswap /swapfile && swapon /swapfile
+echo '/swapfile none swap sw 0 0' >> /etc/fstab
 ```
 
-### Si hay problemas de memoria:
-```javascript
-// En ecosystem.config.cjs
-max_memory_restart: '500M'  // Ajustar según necesidad
+### Si PM2 no encuentra 'serve' (solo aplica al modo alternativo)
+```bash
+pm2 start "npx serve dist -s -l 5173" --name vehicle-registry-frontend
 ```
 
 ## 🎯 Checklist de Despliegue
 
-- [ ] Construir la aplicación (`npm run build`)
-- [ ] Verificar variables de entorno
-- [ ] Instalar PM2 globalmente
-- [ ] Instalar serve
-- [ ] Crear ecosystem.config.cjs
-- [ ] Iniciar con PM2
-- [ ] Configurar startup automático
-- [ ] Configurar Nginx (opcional pero recomendado)
-- [ ] Configurar SSL/HTTPS
-- [ ] Verificar logs y monitoreo
+- [ ] `npm install && npm run build`
+- [ ] `.env.production` con `VITE_API_BASE_URL=/api`
+- [ ] Nginx configurado (sirviendo `dist/` + proxy `/api/`)
+- [ ] Swap habilitado si el servidor tiene poca RAM
+- [ ] SSL/HTTPS configurado (si hay dominio)
 - [ ] Probar la aplicación en producción
-
-## 📱 Acceso
-
-Una vez desplegado:
-- Directamente: `http://tu-servidor:5173`
-- Con Nginx: `http://tu-dominio.com`
-- Con SSL: `https://tu-dominio.com`

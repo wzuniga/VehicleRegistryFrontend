@@ -8,7 +8,7 @@
     "build": "vite build",
     "lint": "eslint .",
     "preview": "vite preview",
-    "deploy": "npm run build && pm2 reload ecosystem.config.cjs",
+    "deploy": "npm run build",
     "pm2:start": "pm2 start ecosystem.config.cjs",
     "pm2:stop": "pm2 stop vehicle-registry-frontend",
     "pm2:restart": "pm2 restart vehicle-registry-frontend",

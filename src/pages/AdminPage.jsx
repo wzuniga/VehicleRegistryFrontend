@@ -21,6 +21,95 @@ const SuccessModal = ({ onClose }) => (
   </div>
 );
 
+const DETECTIONS_PAGE_SIZE = 10;
+
+const formatImageSize = (base64) => {
+  if (!base64) return '—';
+  const bytes = (base64.length * 3) / 4;
+  const kb = bytes / 1024;
+  return kb >= 1024 ? `${(kb / 1024).toFixed(2)} MB` : `${Math.round(kb)} KB`;
+};
+
+const DetectionImage = ({ base64, onDimensions }) => {
+  const src = `data:image/jpeg;base64,${base64}`;
+  return (
+    <img
+      src={src}
+      alt="Placa detectada"
+      className="admin-detection-card__image"
+      onLoad={(e) => onDimensions?.(e.target.naturalWidth, e.target.naturalHeight)}
+      onError={(e) => { e.target.style.display = 'none'; }}
+    />
+  );
+};
+
+const DetectionCard = ({ detection, onSave }) => {
+  const [plate, setPlate] = useState(detection.possiblePlate || '');
+  const [dims, setDims] = useState(null);
+  const [saving, setSaving] = useState(false);
+  const [saved, setSaved] = useState(false);
+
+  const dirty = plate !== (detection.possiblePlate || '');
+
+  const handleSave = async () => {
+    setSaving(true);
+    setSaved(false);
+    try {
+      await onSave(detection.id, plate);
+      setSaved(true);
+      setTimeout(() => setSaved(false), 2000);
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const formatDate = (d) => new Date(d).toLocaleString('es-PE', {
+    day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit',
+  });
+
+  return (
+    <div className="admin-detection-card">
+      <DetectionImage base64={detection.imageBase64} onDimensions={(w, h) => setDims(`${w}×${h}px`)} />
+
+      <div className="admin-detection-card__body">
+        <div className="admin-detection-card__row">
+          <span className={`admin-badge ${detection.reviewed ? 'admin-badge--admin' : 'admin-badge--client'}`}>
+            {detection.reviewed ? 'Revisada' : 'Pendiente'}
+          </span>
+          <span className="admin-detection-card__date">{formatDate(detection.createdAt)}</span>
+        </div>
+
+        <div className="admin-detection-card__plate-form">
+          <label className="admin-form-group__label" htmlFor={`plate-${detection.id}`}>Placa detectada</label>
+          <div className="admin-detection-card__plate-inputrow">
+            <input
+              id={`plate-${detection.id}`}
+              type="text"
+              className="admin-form-group__input"
+              value={plate}
+              placeholder="Sin detectar"
+              onChange={(e) => setPlate(e.target.value.toUpperCase())}
+              maxLength={20}
+            />
+            <button
+              className="admin-btn admin-btn--primary admin-btn--sm"
+              onClick={handleSave}
+              disabled={!dirty || saving || !plate}
+            >
+              {saving ? '...' : saved ? '✓' : 'Guardar'}
+            </button>
+          </div>
+        </div>
+
+        <div className="admin-detection-card__meta">
+          <span>Peso: {formatImageSize(detection.imageBase64)}</span>
+          <span>Dimensiones: {dims || '—'}</span>
+        </div>
+      </div>
+    </div>
+  );
+};
+
 const AdminPage = () => {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
@@ -32,6 +121,12 @@ const AdminPage = () => {
   const [preregError, setPreregError] = useState(null);
   const [showModal, setShowModal] = useState(false);
 
+  const [detections, setDetections] = useState([]);
+  const [detectionsPage, setDetectionsPage] = useState(1);
+  const [detectionsTotalPages, setDetectionsTotalPages] = useState(1);
+  const [detectionsTotal, setDetectionsTotal] = useState(0);
+  const [loadingDetections, setLoadingDetections] = useState(false);
+
   useEffect(() => {
     if (section !== 'users') return;
     setLoadingUsers(true);
@@ -40,6 +135,24 @@ const AdminPage = () => {
       .catch(() => {})
       .finally(() => setLoadingUsers(false));
   }, [section]);
+
+  useEffect(() => {
+    if (section !== 'detections') return;
+    setLoadingDetections(true);
+    api.get('/plate-detections', { params: { page: detectionsPage, limit: DETECTIONS_PAGE_SIZE } })
+      .then(({ data }) => {
+        setDetections(data.data);
+        setDetectionsTotalPages(data.totalPages);
+        setDetectionsTotal(data.total);
+      })
+      .catch(() => {})
+      .finally(() => setLoadingDetections(false));
+  }, [section, detectionsPage]);
+
+  const handleSaveDetectionPlate = async (id, possiblePlate) => {
+    const { data } = await api.patch(`/plate-detections/${id}`, { possiblePlate });
+    setDetections((prev) => prev.map((d) => (d.id === id ? data : d)));
+  };
 
   const handlePreregister = async (e) => {
     e.preventDefault();
@@ -122,13 +235,22 @@ const AdminPage = () => {
               </svg>
               Usuarios registrados
             </button>
+            <button
+              className={`admin-sidebar__link admin-sidebar__link--btn ${section === 'detections' ? 'active' : ''}`}
+              onClick={() => setSection('detections')}
+            >
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
+                <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/>
+              </svg>
+              Detecciones de Placas
+            </button>
           </nav>
         </aside>
 
         {/* Main */}
         <main className="admin-main">
           <h1 className="admin-main__title">
-            {section === 'preregister' ? 'Otorgar Créditos' : 'Usuarios registrados'}
+            {section === 'preregister' ? 'Otorgar Créditos' : section === 'users' ? 'Usuarios registrados' : 'Detecciones de Placas'}
           </h1>
 
           {section === 'preregister' && (
@@ -193,6 +315,51 @@ const AdminPage = () => {
                     </tbody>
                   </table>
                 </div>
+              )}
+            </section>
+          )}
+
+          {section === 'detections' && (
+            <section className="admin-section">
+              <p className="admin-section__desc">
+                Imágenes recibidas de la app de detección de placas. {detectionsTotal} en total.
+              </p>
+
+              {loadingDetections ? (
+                <p className="admin-loading">Cargando detecciones...</p>
+              ) : (
+                <>
+                  <div className="admin-detections-grid">
+                    {detections.map((d) => (
+                      <DetectionCard key={d.id} detection={d} onSave={handleSaveDetectionPlate} />
+                    ))}
+                    {detections.length === 0 && (
+                      <p className="admin-loading">Sin detecciones todavía.</p>
+                    )}
+                  </div>
+
+                  {detectionsTotalPages > 1 && (
+                    <div className="admin-pagination">
+                      <button
+                        className="admin-btn admin-btn--secondary"
+                        onClick={() => setDetectionsPage((p) => Math.max(1, p - 1))}
+                        disabled={detectionsPage <= 1}
+                      >
+                        ← Anterior
+                      </button>
+                      <span className="admin-pagination__label">
+                        Página {detectionsPage} de {detectionsTotalPages}
+                      </span>
+                      <button
+                        className="admin-btn admin-btn--secondary"
+                        onClick={() => setDetectionsPage((p) => Math.min(detectionsTotalPages, p + 1))}
+                        disabled={detectionsPage >= detectionsTotalPages}
+                      >
+                        Siguiente →
+                      </button>
+                    </div>
+                  )}
+                </>
               )}
             </section>
           )}

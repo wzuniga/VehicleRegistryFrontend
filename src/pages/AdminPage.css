@@ -92,6 +92,11 @@
 .admin-sidebar {
   width: 200px;
   flex-shrink: 0;
+  position: sticky;
+  top: calc(56px + 1.5rem);
+  align-self: flex-start;
+  max-height: calc(100vh - 56px - 3rem);
+  overflow-y: auto;
 }
 
 .admin-sidebar__nav {
@@ -427,7 +432,7 @@
 /* Responsive */
 @media (max-width: 768px) {
   .admin-container { flex-direction: column; padding: 1rem; }
-  .admin-sidebar { width: 100%; }
+  .admin-sidebar { width: 100%; position: static; max-height: none; overflow-y: visible; }
   .admin-sidebar__nav { flex-direction: row; flex-wrap: wrap; }
   .admin-grant-form__fields { flex-direction: column; }
 }

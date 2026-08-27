@@ -156,7 +156,7 @@
 
 .admin-detections-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
   gap: 1rem;
 }
 
@@ -196,14 +196,50 @@
   color: #94a3b8;
 }
 
-.admin-detection-card__plate-form {
+.admin-detection-card__compare {
+  display: flex;
+  gap: 0.75rem;
+  padding: 0.6rem;
+  border-radius: 8px;
+  border: 1px solid #e2e8f0;
+  background: #f8fafc;
+}
+
+.admin-detection-card__compare--mismatch {
+  border-color: #fca5a5;
+  background: #fef2f2;
+}
+
+.admin-detection-card__compare-col {
+  flex: 1;
+  min-width: 0;
   display: flex;
   flex-direction: column;
   gap: 0.3rem;
 }
 
+.admin-detection-card__compare-label {
+  font-size: 0.68rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  color: #64748b;
+}
+
+.admin-detection-card__compare-value {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.admin-detection-card__compare-sub {
+  font-size: 0.7rem;
+  color: #64748b;
+}
+
 .admin-detection-card__plate-inputrow {
   display: flex;
+  flex-wrap: wrap;
   gap: 0.4rem;
 }
 .admin-detection-card__plate-inputrow .admin-form-group__input {

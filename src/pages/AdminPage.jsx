@@ -97,6 +97,8 @@ const DetectionCard = ({ detection, onSave, onExpandImage }) => {
   const [saved, setSaved] = useState(false);
 
   const dirty = plate !== (detection.possiblePlate || '');
+  const mismatch = detection.detectedPlate && detection.possiblePlate
+    && detection.detectedPlate !== detection.possiblePlate;
 
   const handleSave = async () => {
     setSaving(true);
@@ -130,30 +132,32 @@ const DetectionCard = ({ detection, onSave, onExpandImage }) => {
           <span className="admin-detection-card__date">{formatDate(detection.createdAt)}</span>
         </div>
 
-        <div className="admin-detection-card__meta">
-          <span>Placa detectada (modelo): <strong>{detection.detectedPlate || '—'}</strong></span>
-          <span>Confianza: {formatConfidence(detection.confidence)}</span>
-        </div>
-
-        <div className="admin-detection-card__plate-form">
-          <label className="admin-form-group__label" htmlFor={`plate-${detection.id}`}>Placa confirmada</label>
-          <div className="admin-detection-card__plate-inputrow">
-            <input
-              id={`plate-${detection.id}`}
-              type="text"
-              className="admin-form-group__input"
-              value={plate}
-              placeholder="Sin detectar"
-              onChange={(e) => setPlate(e.target.value.toUpperCase())}
-              maxLength={20}
-            />
-            <button
-              className="admin-btn admin-btn--primary admin-btn--sm"
-              onClick={handleSave}
-              disabled={!dirty || saving || !plate}
-            >
-              {saving ? '...' : saved ? '✓' : 'Guardar'}
-            </button>
+        <div className={`admin-detection-card__compare ${mismatch ? 'admin-detection-card__compare--mismatch' : ''}`}>
+          <div className="admin-detection-card__compare-col">
+            <span className="admin-detection-card__compare-label">Detectada (modelo)</span>
+            <span className="admin-detection-card__compare-value">{detection.detectedPlate || '—'}</span>
+            <span className="admin-detection-card__compare-sub">Confianza: {formatConfidence(detection.confidence)}</span>
+          </div>
+          <div className="admin-detection-card__compare-col">
+            <label className="admin-detection-card__compare-label" htmlFor={`plate-${detection.id}`}>Confirmada</label>
+            <div className="admin-detection-card__plate-inputrow">
+              <input
+                id={`plate-${detection.id}`}
+                type="text"
+                className="admin-form-group__input"
+                value={plate}
+                placeholder="Sin detectar"
+                onChange={(e) => setPlate(e.target.value.toUpperCase())}
+                maxLength={20}
+              />
+              <button
+                className="admin-btn admin-btn--primary admin-btn--sm"
+                onClick={handleSave}
+                disabled={!dirty || saving || !plate}
+              >
+                {saving ? '...' : saved ? '✓' : 'Guardar'}
+              </button>
+            </div>
           </div>
         </div>
 

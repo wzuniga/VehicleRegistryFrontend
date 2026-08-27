@@ -59,6 +59,11 @@ const formatImageSize = (base64) => {
   return kb >= 1024 ? `${(kb / 1024).toFixed(2)} MB` : `${Math.round(kb)} KB`;
 };
 
+const formatConfidence = (confidence) => {
+  if (confidence === null || confidence === undefined) return '—';
+  return `${(confidence * 100).toFixed(1)}%`;
+};
+
 const DetectionImage = ({ base64, onDimensions, onClick }) => {
   const src = `data:image/jpeg;base64,${base64}`;
   return (
@@ -125,8 +130,13 @@ const DetectionCard = ({ detection, onSave, onExpandImage }) => {
           <span className="admin-detection-card__date">{formatDate(detection.createdAt)}</span>
         </div>
 
+        <div className="admin-detection-card__meta">
+          <span>Placa detectada (modelo): <strong>{detection.detectedPlate || '—'}</strong></span>
+          <span>Confianza: {formatConfidence(detection.confidence)}</span>
+        </div>
+
         <div className="admin-detection-card__plate-form">
-          <label className="admin-form-group__label" htmlFor={`plate-${detection.id}`}>Placa detectada</label>
+          <label className="admin-form-group__label" htmlFor={`plate-${detection.id}`}>Placa confirmada</label>
           <div className="admin-detection-card__plate-inputrow">
             <input
               id={`plate-${detection.id}`}
@@ -172,6 +182,7 @@ const AdminPage = () => {
   const [detectionsTotalPages, setDetectionsTotalPages] = useState(1);
   const [detectionsTotal, setDetectionsTotal] = useState(0);
   const [loadingDetections, setLoadingDetections] = useState(false);
+  const [detectionsFilter, setDetectionsFilter] = useState('all'); // 'all' | 'reviewed' | 'pending'
   const [expandedImage, setExpandedImage] = useState(null);
 
   const [isSidebarOpen, setIsSidebarOpen] = useState(() => window.innerWidth > 768);
@@ -197,7 +208,9 @@ const AdminPage = () => {
   useEffect(() => {
     if (section !== 'detections') return;
     setLoadingDetections(true);
-    api.get('/plate-detections', { params: { page: detectionsPage, limit: DETECTIONS_PAGE_SIZE } })
+    const params = { page: detectionsPage, limit: DETECTIONS_PAGE_SIZE };
+    if (detectionsFilter !== 'all') params.reviewed = detectionsFilter === 'reviewed';
+    api.get('/plate-detections', { params })
       .then(({ data }) => {
         setDetections(data.data);
         setDetectionsTotalPages(data.totalPages);
@@ -205,7 +218,12 @@ const AdminPage = () => {
       })
       .catch(() => {})
       .finally(() => setLoadingDetections(false));
-  }, [section, detectionsPage]);
+  }, [section, detectionsPage, detectionsFilter]);
+
+  const handleDetectionsFilterChange = (value) => {
+    setDetectionsFilter(value);
+    setDetectionsPage(1);
+  };
 
   const handleSaveDetectionPlate = async (id, possiblePlate) => {
     const { data } = await api.patch(`/plate-detections/${id}`, { possiblePlate });
@@ -339,6 +357,27 @@ const AdminPage = () => {
               <p className="admin-section__desc">
                 Imágenes recibidas de la app de detección de placas. {detectionsTotal} en total.
               </p>
+
+              <div className="admin-detections-filter">
+                <button
+                  className={`admin-filter-btn ${detectionsFilter === 'all' ? 'active' : ''}`}
+                  onClick={() => handleDetectionsFilterChange('all')}
+                >
+                  Todos
+                </button>
+                <button
+                  className={`admin-filter-btn ${detectionsFilter === 'pending' ? 'active' : ''}`}
+                  onClick={() => handleDetectionsFilterChange('pending')}
+                >
+                  Pendientes
+                </button>
+                <button
+                  className={`admin-filter-btn ${detectionsFilter === 'reviewed' ? 'active' : ''}`}
+                  onClick={() => handleDetectionsFilterChange('reviewed')}
+                >
+                  Revisados
+                </button>
+              </div>
 
               {loadingDetections ? (
                 <p className="admin-loading">Cargando detecciones...</p>

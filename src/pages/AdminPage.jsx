@@ -50,6 +50,28 @@ const SuccessModal = ({ onClose }) => (
   </div>
 );
 
+const ConfirmDeleteModal = ({ onConfirm, onCancel, deleting }) => (
+  <div className="admin-modal-overlay" onClick={onCancel}>
+    <div className="admin-modal" onClick={(e) => e.stopPropagation()}>
+      <div className="admin-modal__icon admin-modal__icon--danger">
+        <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+          <polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
+        </svg>
+      </div>
+      <h3 className="admin-modal__title">¿Eliminar esta detección?</h3>
+      <p className="admin-modal__text">Esta acción no se puede deshacer. La imagen y sus datos se borrarán permanentemente.</p>
+      <div style={{ display: 'flex', gap: '0.75rem' }}>
+        <button className="admin-btn admin-btn--secondary" onClick={onCancel} disabled={deleting} style={{ flex: 1 }}>
+          Cancelar
+        </button>
+        <button className="admin-btn admin-btn--danger" onClick={onConfirm} disabled={deleting} style={{ flex: 1 }}>
+          {deleting ? 'Eliminando...' : 'Eliminar'}
+        </button>
+      </div>
+    </div>
+  </div>
+);
+
 const DETECTIONS_PAGE_SIZE = 12;
 
 const formatImageSize = (base64) => {
@@ -90,7 +112,7 @@ const ImageLightbox = ({ base64, onClose }) => (
   </div>
 );
 
-const DetectionCard = ({ detection, onSave, onExpandImage }) => {
+const DetectionCard = ({ detection, onSave, onExpandImage, onRequestDelete }) => {
   const [plate, setPlate] = useState(detection.possiblePlate || '');
   const [dims, setDims] = useState(null);
   const [saving, setSaving] = useState(false);
@@ -126,10 +148,22 @@ const DetectionCard = ({ detection, onSave, onExpandImage }) => {
 
       <div className="admin-detection-card__body">
         <div className="admin-detection-card__row">
-          <span className={`admin-badge ${detection.reviewed ? 'admin-badge--admin' : 'admin-badge--client'}`}>
-            {detection.reviewed ? 'Revisada' : 'Pendiente'}
-          </span>
-          <span className="admin-detection-card__date">{formatDate(detection.createdAt)}</span>
+          <div className="admin-detection-card__row-info">
+            <span className={`admin-badge ${detection.reviewed ? 'admin-badge--admin' : 'admin-badge--client'}`}>
+              {detection.reviewed ? 'Revisada' : 'Pendiente'}
+            </span>
+            <span className="admin-detection-card__date">{formatDate(detection.createdAt)}</span>
+          </div>
+          <button
+            className="admin-detection-card__delete"
+            onClick={() => onRequestDelete(detection.id)}
+            aria-label="Eliminar detección"
+            title="Eliminar detección"
+          >
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
+            </svg>
+          </button>
         </div>
 
         <div className={`admin-detection-card__compare ${mismatch ? 'admin-detection-card__compare--mismatch' : ''}`}>
@@ -188,6 +222,8 @@ const AdminPage = () => {
   const [loadingDetections, setLoadingDetections] = useState(false);
   const [detectionsFilter, setDetectionsFilter] = useState('all'); // 'all' | 'reviewed' | 'pending'
   const [expandedImage, setExpandedImage] = useState(null);
+  const [deletingDetectionId, setDeletingDetectionId] = useState(null);
+  const [isDeletingDetection, setIsDeletingDetection] = useState(false);
 
   const [isSidebarOpen, setIsSidebarOpen] = useState(() => window.innerWidth > 768);
 
@@ -234,6 +270,21 @@ const AdminPage = () => {
     setDetections((prev) => prev.map((d) => (d.id === id ? data : d)));
   };
 
+  const handleConfirmDeleteDetection = async () => {
+    if (!deletingDetectionId) return;
+    setIsDeletingDetection(true);
+    try {
+      await api.delete(`/plate-detections/${deletingDetectionId}`);
+      setDetections((prev) => prev.filter((d) => d.id !== deletingDetectionId));
+      setDetectionsTotal((t) => Math.max(0, t - 1));
+      setDeletingDetectionId(null);
+    } catch {
+      // deja el modal abierto para reintentar
+    } finally {
+      setIsDeletingDetection(false);
+    }
+  };
+
   const handlePreregister = async (e) => {
     e.preventDefault();
     setPreregError(null);
@@ -273,6 +324,13 @@ const AdminPage = () => {
     <div className="admin-layout">
       {showModal && <SuccessModal onClose={() => setShowModal(false)} />}
       {expandedImage && <ImageLightbox base64={expandedImage} onClose={() => setExpandedImage(null)} />}
+      {deletingDetectionId && (
+        <ConfirmDeleteModal
+          deleting={isDeletingDetection}
+          onCancel={() => setDeletingDetectionId(null)}
+          onConfirm={handleConfirmDeleteDetection}
+        />
+      )}
 
       <Navbar onToggleSidebar={() => setIsSidebarOpen((v) => !v)} user={user} />
 
@@ -394,6 +452,7 @@ const AdminPage = () => {
                         detection={d}
                         onSave={handleSaveDetectionPlate}
                         onExpandImage={setExpandedImage}
+                        onRequestDelete={setDeletingDetectionId}
                       />
                     ))}
                     {detections.length === 0 && (
